@@ -17,3 +17,31 @@
 - feature/<対応内容>
 
 例）feature/login_form
+
+## 開発環境
+`./backend`ディレクトリに移動して、
+コンテナ起動（開発を開始する毎）
+```
+docker compose up -d
+```
+
+念の為、コンテナの起動確認
+```
+docker compose ps
+```
+
+
+
+もし、エラーが発生している場合でログ確認
+```
+docker compose logs
+```
+
+コンテナ停止
+```
+docker compose down
+```
+
+## vscode拡張設定
+`.vscode`ディレクトリ下に`settings.json`で保存時に各言語のフォーマットや設定を走らせるように設定した。
+`.vscode`ディレクトリ下に`extensions.json`で設定してほしい拡張機能を設定しておいたので、vscode上の拡張機能画面で`@recommended`を検索すると、一覧で表示される。
