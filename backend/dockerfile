@@ -19,4 +19,4 @@ RUN apk add --no-cache postgresql-libs \
 COPY . /app
 
 # FastAPIの起動
-CMD ["uvicorn", "main:app", "--reload", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "run:app", "--reload", "--host", "0.0.0.0", "--port", "8000"]
