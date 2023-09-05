@@ -20,6 +20,14 @@
 
 ## 開発環境
 `./backend`ディレクトリに移動して、
+コンテナのビルド（開発をはじめて行う時）
+```
+docker compose build
+```
+キャッシュなしでビルドしたいときは
+```
+docker compose build --no-cache
+```
 コンテナ起動（開発を開始する毎）
 ```
 docker compose up -d
