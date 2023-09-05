@@ -10,7 +10,7 @@ from alembic import context
 from core.config import PROJECT_ROOT
 from dotenv import load_dotenv
 
-from migration.settings import BaseModel, Engine
+from migration.models import BaseModel, Engine
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
