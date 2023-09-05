@@ -4,9 +4,9 @@ function Login() {
       <div className="container p-5">
         <div className="d-flex my-5">
           <div className="col-12 mt-5 border border-dark p-5 rounded">
-            <h3 className="mb-4">ログイン</h3>
+            <h3 className="mb-5">ログイン</h3>
 
-            <div className="mb-4">
+            <div className="mb-5">
               <input
                 type="text"
                 className="form-control"
@@ -19,14 +19,6 @@ function Login() {
                 type="text"
                 className="form-control"
                 placeholder="パスワードを入力してください"
-              />
-            </div>
-
-            <div className="">
-              <input
-                type="text"
-                className="form-control"
-                placeholder="再度パスワードを入力してください"
               />
             </div>
 
