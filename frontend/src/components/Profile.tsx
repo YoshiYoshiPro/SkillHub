@@ -4,79 +4,41 @@ function Profile() {
   const [textName, setNameText] = useState("");
   const [textMail, setMailText] = useState("");
   const [textJoin, setJoinText] = useState("");
-  const [text, setText] = useState("");
-  const [text, setText] = useState("");
-  const [text, setText] = useState("");
-  const [text, setText] = useState("");
-  const [text, setText] = useState("");
-  const [text, setText] = useState("");
-  const [text, setText] = useState("");
-  const [text, setText] = useState("");
+  const [textWord, setWordText] = useState("");
+  const [textAff, setAffText] = useState("");
+  const [textInterest, setInterestText] = useState("");
+  const [textBusiness, setBusinessText] = useState("");
+  const [textGood, setGoodText] = useState("");
 
   const nameChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.value.length > 5) {
-      alert("5文字以内");
-      return;
-    }
     setNameText(e.target.value.trim());
   }, []);
   const mailChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.value.length > 5) {
-      alert("5文字以内");
-      return;
-    }
     setMailText(e.target.value.trim());
   }, []);
   const joinChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.value.length > 5) {
-      alert("5文字以内");
-      return;
-    }
-    setText(e.target.value.trim());
+    setJoinText(e.target.value.trim());
   }, []);
   const wordChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.value.length > 5) {
-      alert("5文字以内");
-      return;
-    }
-    setText(e.target.value.trim());
+    setWordText(e.target.value.trim());
   }, []);
-  const AffiliationChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      if (e.target.value.length > 5) {
-        alert("5文字以内");
-        return;
-      }
-      setText(e.target.value.trim());
-    },
-    []
-  );
+  const AffChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setAffText(e.target.value.trim());
+  }, []);
   const interestChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
-      if (e.target.value.length > 5) {
-        alert("5文字以内");
-        return;
-      }
-      setText(e.target.value.trim());
+      setInterestText(e.target.value.trim());
     },
     []
   );
   const businessChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
-      if (e.target.value.length > 5) {
-        alert("5文字以内");
-        return;
-      }
-      setText(e.target.value.trim());
+      setBusinessText(e.target.value.trim());
     },
     []
   );
   const goodChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.value.length > 5) {
-      alert("5文字以内");
-      return;
-    }
-    setText(e.target.value.trim());
+    setGoodText(e.target.value.trim());
   }, []);
 
   return (
@@ -91,75 +53,75 @@ function Profile() {
             />
           </div>
           <div className="col-8">
-            <div className="mb-5 d-flex">
-              <p className="mt-5 mb-1">名前</p>
+            <div className="mt-5 mb-5 d-flex">
+              <p className=" mb-1">名前</p>
               <input
                 type="text"
-                className="form-control"
+                className="form-control w-75 ml-auto"
                 value={textName}
                 onChange={nameChange}
               />
             </div>
             <div className="mb-5 d-flex">
-              <p className="mt-5 mb-1">メールアドレス:</p>
+              <p className=" mb-1">メールアドレス:</p>
               <input
                 type="text"
-                className="form-control"
+                className="form-control w-75 ml-auto"
                 value={textMail}
                 onChange={mailChange}
               />
             </div>
             <div className="mb-5 d-flex">
-              <p className="mt-5 mb-1">ひとこと</p>
+              <p className=" mb-1">ひとこと</p>
               <input
                 type="text"
-                className="form-control"
-                value={text}
+                className="form-control w-75 ml-auto"
+                value={textJoin}
                 onChange={wordChange}
               />
             </div>
             <div className="mb-5 d-flex">
-              <p className="mt-5 mb-1">入社年数</p>
+              <p className=" mb-1">入社年数</p>
               <input
                 type="text"
-                className="form-control"
-                value={text}
+                className="form-control w-75 ml-auto"
+                value={textWord}
                 onChange={joinChange}
               />
             </div>
             <div className="mb-5 d-flex">
-              <p className="mt-5 mb-1">所属先</p>
+              <p className=" mb-1">所属先</p>
               <input
                 type="text"
-                className="form-control"
-                value={text}
-                onChange={AffiliationChange}
+                className="form-control w-75 ml-auto"
+                value={textAff}
+                onChange={AffChange}
               />
             </div>
             <div className="mb-5 d-flex">
-              <p className="mt-5 mb-1">興味のある技術</p>
+              <p className=" mb-1">興味のある技術</p>
               <input
                 type="text"
-                className="form-control"
-                value={text}
+                className="form-control w-75 ml-auto"
+                value={textInterest}
                 onChange={interestChange}
               />
             </div>
             <div className="mb-5 d-flex">
-              <p className="mt-5 mb-1">業務経験のある技術</p>
+              <p className=" mb-1">業務経験のある技術</p>
               <input
                 type="text"
-                className="form-control"
-                value={text}
+                className="form-control w-75 ml-auto"
+                value={textBusiness}
                 onChange={businessChange}
               />
             </div>
             <div className="mb-5 d-flex">
-              <p className="mt-5 mb-1">得意な技術</p>
+              <p className=" mb-1">得意な技術</p>
               <input
                 type="text"
-                className="form-control"
-                value={text}
+                className="form-control w-75 ml-auto"
+                value={textGood}
                 onChange={goodChange}
               />
             </div>
