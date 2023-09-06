@@ -12,8 +12,8 @@ interface SessionSuggestionPost {
 interface SearchTagResponse {
 	is_accepted: boolean,
 	interests: {user_id: string, name: string, icon_url: string}[],
-	expertises: {user_id: string, name: string, icon_url: string}[],
-	experiences: {user_id: string, name: string, icon_url: string}[],
+	expertises: {user_id: string, name: string, icon_url: string, years: number}[],
+	experiences: {user_id: string, name: string, icon_url: string, years: number}[],
 }
 
 
@@ -23,8 +23,8 @@ function Home() {
   const [tag, setTag] = useState("");
 
   const [interests, setInterests] = useState([] as {user_id: string, name: string, icon_url: string}[]);
-  const [expertises, setExpertises] = useState([] as {user_id: string, name: string, icon_url: string}[]);
-  const [experiences, setExperiences] = useState([] as {user_id: string, name: string, icon_url: string}[]);
+  const [expertises, setExpertises] = useState([] as {user_id: string, name: string, icon_url: string, years: number}[]);
+  const [experiences, setExperiences] = useState([] as {user_id: string, name: string, icon_url: string, years: number}[]);
 
   const data = [
     { name: "1年目", year: 30 },
@@ -77,7 +77,7 @@ function Home() {
   ];
 
   const search_tag = (tag: string) => {
-    axios.get('http://localhost:8000/search-tag')
+    axios.get('http://localhost:8000/search-tag/' + tag)
     .then((res) => {
       const search_tag_res: SearchTagResponse = res.data;
       if(search_tag_res.is_accepted) {
@@ -133,6 +133,50 @@ function Home() {
                     <YAxis />
                     <Bar dataKey="year" barSize={20} fill="red" />
                   </ComposedChart>
+                </div>
+
+                <h4 className="mt-4 mb-0 ml-2">業務経験のある人</h4>
+                <div className="d-flex flex-wrap">
+                  {expertises.map((expertise) => {
+                    return (
+                      <div className="col-6 p-0">
+                        <div className="m-2 p-1 border border-gray rounded d-flex">
+                          <img
+                            className="border border-dark rounded-circle m-1"
+                            src={expertise.icon_url}
+                            width={50}
+                          />
+                          <div className="my-auto">
+                            <h4 className="m-0">{expertise.name}</h4>
+                            <p className="m-0">{expertise.user_id}</p>
+                          </div>
+                          <h4 className="ml-auto mr-2 my-auto">{expertise.years}年目</h4>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                <h4 className="mt-4 mb-0 ml-2">得意な人</h4>
+                <div className="d-flex flex-wrap">
+                  {experiences.map((experience) => {
+                    return (
+                      <div className="col-6 p-0">
+                        <div className="m-2 p-1 border border-gray rounded d-flex">
+                          <img
+                            className="border border-dark rounded-circle m-1"
+                            src={experience.icon_url}
+                            width={50}
+                          />
+                          <div className="my-auto">
+                            <h4 className="m-0">{experience.name}</h4>
+                            <p className="m-0">{experience.user_id}</p>
+                          </div>
+                          <h4 className="ml-auto mr-2 my-auto">{experience.years}年目</h4>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
 
                 <h4 className="mt-4 mb-0 ml-2">興味のある人</h4>
