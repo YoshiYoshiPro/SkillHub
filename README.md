@@ -50,6 +50,19 @@ docker compose logs
 docker compose down
 ```
 
+postgreSQLコンテナに入る方法
+```
+docker container exec -it postgres-db bash
+```
+DBモード起動
+```
+psql -U postgres
+```
+テーブル確認
+```
+\dt
+```
+
 ## vscode拡張設定
 `.vscode`ディレクトリ下に`settings.json`で保存時に各言語のフォーマットや設定を走らせるように設定した。
 `.vscode`ディレクトリ下に`extensions.json`で設定してほしい拡張機能を設定しておいたので、vscode上の拡張機能画面で`@recommended`を検索すると、一覧で表示される。
