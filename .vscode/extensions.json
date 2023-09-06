@@ -3,6 +3,9 @@
     "esbenp.prettier-vscode", // prettier
     "EditorConfig.EditorConfig", // editorconfig
     "DavidAnson.vscode-markdownlint", // markdownlint
-    "ms-python.python" // python
+    "ms-python.python", // python
+    "eamodio.gitlens", // gitlens
+    "donjayamanne.githistory", // githistory
+    "mhutchie.git-graph" // gitgraph
   ]
 }
