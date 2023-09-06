@@ -59,6 +59,7 @@ function Home() {
       const search_tag_res: SearchTagResponse = res.data;
       if(search_tag_res.is_accepted) {
         setIsSearched(true);
+        setTag(tag);
         setInterests(search_tag_res.interests);
         setExpertises(search_tag_res.expertises);
         setExperiences(search_tag_res.experiences);
