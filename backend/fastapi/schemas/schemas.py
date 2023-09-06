@@ -10,7 +10,7 @@ class UsersBase(BaseModel):
 
 
 class UsersCreate(UsersBase):
-    pass
+    created_at : datetime
 
 
 class UsersRead(UsersBase):
