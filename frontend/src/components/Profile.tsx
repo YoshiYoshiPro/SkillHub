@@ -24,7 +24,7 @@ function Profile() {
   const mailChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setMailText(e.target.value.trim());
   }, []);
-  const joinChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+  const JoinChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setJoinText(e.target.value.trim());
   }, []);
   const wordChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
@@ -110,7 +110,7 @@ function Profile() {
                   type="text"
                   className="form-control w-75 ml-auto"
                   value={textJoin}
-                  onChange={joinChange}
+                  onChange={JoinChange}
                 />
               ) : (
                 <p className="text-center w-75 ml-auto">{textJoin}</p>
