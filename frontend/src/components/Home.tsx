@@ -16,11 +16,16 @@ interface SearchTagResponse {
 	experiences: {user_id: string, name: string, icon_url: string, years: number}[],
 }
 
+interface GetSuggestedTagsResponse {
+  suggested_tags: string[],
+}
+
 
 function Home() {
   const [is_searching, setIsSearching] = useState(false);
   const [is_searched, setIsSearched] = useState(false);
   const [tag, setTag] = useState("");
+  const [suggested_tags, setSuggestedTags] = useState(["SolidJS", "Three.JS", "Golang"]);
 
   const [interests, setInterests] = useState([] as {user_id: string, name: string, icon_url: string}[]);
   const [expertises, setExpertises] = useState([] as {user_id: string, name: string, icon_url: string, years: number}[]);
@@ -70,6 +75,17 @@ function Home() {
     });
   }
 
+  const get_suggested_tags = (tag_substring: string) => {
+    axios.get('http://localhost:8000/get-suggested-tags/' + tag_substring)
+    .then((res) => {
+      const get_suggested_tags_res: GetSuggestedTagsResponse = res.data;
+      setSuggestedTags(get_suggested_tags_res.suggested_tags);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+  }
+
   return (
     <>
       <Modal show={is_searching} size="lg" onHide={() => setIsSearching(false)}>
@@ -81,15 +97,18 @@ function Home() {
                 type="text"
                 className="px-3 py-2 m-0 col-9 border border-gray rounded-pill h3"
                 value={tag}
-                onChange={(e) => {setTag(e.target.value)}}
+                onChange={(e) => {
+                  setTag(e.target.value);
+                  get_suggested_tags(e.target.value);
+                }}
               />
             </div>
             <div className="d-flex mb-2">
               <div className="col-9 d-flex ml-auto px-2 py-2 lh-auto border border-gray rounded">
-                {trending_technologies.map((technology) => {
+                {suggested_tags.map((tag) => {
                   return (
-                    <button className="btn btn-link p-0 mx-2" onClick={() => {search_tag(technology)}}>
-                      #{technology}
+                    <button className="btn btn-link p-0 mx-2" onClick={() => {search_tag(tag)}}>
+                      #{tag}
                     </button>
                   );
                 })}

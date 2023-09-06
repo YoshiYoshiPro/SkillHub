@@ -9,6 +9,11 @@ from sqlalchemy.orm import Session
 from starlette.middleware.cors import CORSMiddleware
 from starlette.requests import Request
 
+
+'''from core import config
+from crud import crud'''
+from fastapi import Depends, FastAPI, HTTPException
+
 # from migration import database, models
 
 app = FastAPI(title="社内勉強会の開催を活発にするwebアプリ", description="社内の勉強会の予定を共有するWebアプリケーション")
@@ -106,4 +111,12 @@ def get_tag_result(request: Request, tag):
                 "years": 5,
             },
         ],
+    }
+
+
+def get_suggested_tags(request: Request, tag_substring):
+    tmp_tags = ["Java", "JavaScript", "SolidJS", "Three.JS", "Golang"]
+
+    return {
+    	"suggested_tags": [tag for tag in tmp_tags if tag_substring in tag],
     }
