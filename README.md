@@ -62,6 +62,32 @@ psql -U postgres
 ```
 \dt
 ```
+## テーブルの運用
+- テーブルの変更を行いたい場合は`./backend/fastapi/migration/models.py`に移動して、編集を行う
+- `./backend`に移動して、アプリコンテナに入る
+```
+docker-compose exec fastapi sh
+```
+- migrationファイルの生成のために、以下のコマンドを実行する。
+```
+/app # alembic revision --autogenerate -m "add columns"
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+INFO  [alembic.ddl.postgresql] Detected sequence named 'users_id_seq' as owned by integer column 'users(id)', assuming SERIAL and omitting
+INFO  [alembic.autogenerate.compare] Detected added column 'users.created_at'
+INFO  [alembic.autogenerate.compare] Detected added column 'users.updated_at'
+INFO  [alembic.autogenerate.compare] Detected added unique constraint 'None' on '['login_id']'
+  Generating /app/migration/versions/YYYYMMddHHmm_add_columns.py ...  done
+
+```
+
+- --autogenerateオプションをつけることで、models.pyを元にすでにあるmigrationファイルとの差分のmigrationファイルを作成してくれる
+
+- migrationの実行を行う。
+```
+alembic upgrade head
+```
+
 
 ## vscode拡張設定
 `.vscode`ディレクトリ下に`settings.json`で保存時に各言語のフォーマットや設定を走らせるように設定した。
