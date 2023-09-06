@@ -24,3 +24,16 @@ def index(request: Request):
 
 def get_data(request: Request):
     return {"key": "value","message":"Hello from FastAPI!"}
+
+
+def get_tag_result(request: Request):
+    return {
+        "is_accepted": True,
+    	"interests": [
+            {"user_id": "aaa", "name": "あああ", "icon_url": "http://localhost:3000/logo192.png"},
+            {"user_id": "bbb", "name": "いいい", "icon_url": "http://localhost:3000/logo192.png"},
+            {"user_id": "ccc", "name": "ううう", "icon_url": "http://localhost:3000/logo192.png"},
+        ],
+	    "expertises": [],
+	    "experiences": [],
+    }

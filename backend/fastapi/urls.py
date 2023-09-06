@@ -8,3 +8,5 @@ app.add_api_route('/data',get_data)
 
 # # プロフィールの表示
 # app.add_api_route('/get-profile',get_profile)
+
+app.add_api_route('/search-tag', get_tag_result)
