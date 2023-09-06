@@ -42,16 +42,6 @@ def get_data(request: Request):
     return {"key": "value","message":"Hello from FastAPI!"}
 
 
-<<<<<<< HEAD
-# @app.get("/users/", response_model=List[schemas.UsersRead])
-# def read_users(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
-#     users = crud.get_users(db, skip=skip, limit=limit)
-#     return users
-
-# @app.post("/users/", response_model=schemas.UsersRead)
-# def create_user(user: schemas.UsersCreate, db: Session = Depends(get_db)):
-#     return crud.create_user(db=db, user=user)
-=======
 def get_tag_result(request: Request, tag):
     return {
         "is_accepted": True,
@@ -72,4 +62,3 @@ def get_tag_result(request: Request, tag):
             {"user_id": "eee", "name": "おおお", "icon_url": "http://localhost:3000/logo192.png", "years": 5},
         ],
     }
->>>>>>> e3b4707a19fa269dab47b41e6f9b8eaac7fd0dec
