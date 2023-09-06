@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { auth, provider } from "../firebase";
+import { signInWithPopup } from "firebase/auth";
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
@@ -8,11 +9,18 @@ const Login: React.FC = () => {
 
   const handleLogin = async (event: React.MouseEvent<HTMLButtonElement>) => {
     try {
-      await auth.signInWithPopup(provider);
+      await signInWithPopup(auth, provider);
       navigate("/");
     } catch (error) {
-      console.log(error);
-      setError(error.message);
+      if (error instanceof Error) {
+        // 型チェック
+        console.log(error.message);
+        setError(error.message);
+      } else {
+        // errorがErrorオブジェクトでない場合の処理（必要に応じて）
+        console.log(error);
+        setError("An unknown error occurred.");
+      }
     }
   };
 
