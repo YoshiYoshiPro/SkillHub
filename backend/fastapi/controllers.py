@@ -1,14 +1,15 @@
 from typing import List
 
 import uvicorn
-
-# from core import config
-# from crud import crud
-from fastapi import Depends, FastAPI, HTTPException
 from sqlalchemy.orm import Session
 from starlette.middleware.cors import CORSMiddleware
 from starlette.requests import Request
 
+from core.database import get_db  # ここでget_db関数をインポート
+from crud import crud
+from fastapi import APIRouter, Depends, FastAPI, HTTPException
+from migration import models
+from schemas import schemas
 
 '''from core import config
 from crud import crud'''
@@ -19,13 +20,7 @@ from fastapi import Depends, FastAPI, HTTPException
 app = FastAPI(title="社内勉強会の開催を活発にするwebアプリ", description="社内の勉強会の予定を共有するWebアプリケーション")
 
 
-# # Dependency
-# def get_db():
-#     db = database.SessionLocal()
-#     try:
-#         yield db
-#     finally:
-#         db.close()
+router = APIRouter()
 
 # CORS対応 (https://qiita.com/satto_sann/items/0e1f5dbbe62efc612a78)
 app.add_middleware(
@@ -120,3 +115,24 @@ def get_suggested_tags(request: Request, tag_substring):
     return {
     	"suggested_tags": [tag for tag in tmp_tags if tag_substring in tag],
     }
+
+def get_user_by_id(request: Request, user_id: int):
+    # データベースセッションを取得
+    db = request.state.db
+
+    # ユーザーをデータベースから取得
+    user = db.query(models.Users).filter(models.Users.id == user_id).first()
+
+    if user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    return user
+
+
+def create_user(user: schemas.UsersCreate, db: Session = Depends(get_db)):
+    return crud.create_user(db, user)
+
+
+def get_all_users(db: Session = Depends(get_db)):
+    users = crud.get_all_users(db)  # データベース操作関数を呼び出してデータを取得
+    return users
