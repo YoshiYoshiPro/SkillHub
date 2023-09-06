@@ -62,3 +62,11 @@ def get_tag_result(request: Request, tag):
             {"user_id": "eee", "name": "おおお", "icon_url": "http://localhost:3000/logo192.png", "years": 5},
         ],
     }
+
+
+def get_suggested_tags(request: Request, tag_substring):
+    tmp_tags = ["Java", "JavaScript", "SolidJS", "Three.JS", "Golang"]
+
+    return {
+    	"suggested_tags": [tag for tag in tmp_tags if tag_substring in tag],
+    }
