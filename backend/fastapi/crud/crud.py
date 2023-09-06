@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 
-from ..migration import models
-from ..schemas import schemas
+'''from ..migration import models
+from ..schemas import schemas'''
 
 
 # For Users
