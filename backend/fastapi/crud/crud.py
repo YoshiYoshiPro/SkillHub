@@ -1,12 +1,13 @@
 from sqlalchemy.orm import Session
 
-from ..migration import models
-from ..schemas import schemas
+# from ..migration import models
+# from ..schemas import schemas
 
 
 # For Users
 def get_user(db: Session, user_id: int):
     return db.query(models.Users).filter(models.Users.id == user_id).first()
+
 
 def create_user(db: Session, user: schemas.UsersCreate):
     db_user = models.Users(**user.dict())
@@ -15,9 +16,13 @@ def create_user(db: Session, user: schemas.UsersCreate):
     db.refresh(db_user)
     return db_user
 
+
 # For UserActive
 def get_user_active(db: Session, user_id: int):
-    return db.query(models.UserActive).filter(models.UserActive.user_id == user_id).first()
+    return (
+        db.query(models.UserActive).filter(models.UserActive.user_id == user_id).first()
+    )
+
 
 def create_user_active(db: Session, user_active: schemas.UserActiveCreate):
     db_user_active = models.UserActive(**user_active.dict())
@@ -26,9 +31,13 @@ def create_user_active(db: Session, user_active: schemas.UserActiveCreate):
     db.refresh(db_user_active)
     return db_user_active
 
+
 # For UserLeave
 def get_user_leave(db: Session, user_id: int):
-    return db.query(models.UserLeave).filter(models.UserLeave.user_id == user_id).first()
+    return (
+        db.query(models.UserLeave).filter(models.UserLeave.user_id == user_id).first()
+    )
+
 
 def create_user_leave(db: Session, user_leave: schemas.UserLeaveCreate):
     db_user_leave = models.UserLeave(**user_leave.dict())
@@ -37,9 +46,13 @@ def create_user_leave(db: Session, user_leave: schemas.UserLeaveCreate):
     db.refresh(db_user_leave)
     return db_user_leave
 
+
 # For UserDetail
 def get_user_detail(db: Session, user_id: int):
-    return db.query(models.UserDetail).filter(models.UserDetail.user_id == user_id).first()
+    return (
+        db.query(models.UserDetail).filter(models.UserDetail.user_id == user_id).first()
+    )
+
 
 def create_user_detail(db: Session, user_detail: schemas.UserDetailCreate):
     db_user_detail = models.UserDetail(**user_detail.dict())
@@ -48,9 +61,13 @@ def create_user_detail(db: Session, user_detail: schemas.UserDetailCreate):
     db.refresh(db_user_detail)
     return db_user_detail
 
+
 # For Technologies
 def get_technology(db: Session, tech_id: int):
-    return db.query(models.Technologies).filter(models.Technologies.id == tech_id).first()
+    return (
+        db.query(models.Technologies).filter(models.Technologies.id == tech_id).first()
+    )
+
 
 def create_technology(db: Session, technology: schemas.TechnologiesCreate):
     db_technology = models.Technologies(**technology.dict())
@@ -59,9 +76,15 @@ def create_technology(db: Session, technology: schemas.TechnologiesCreate):
     db.refresh(db_technology)
     return db_technology
 
+
 # For UserExperiences
 def get_user_experience(db: Session, experience_id: int):
-    return db.query(models.UserExperiences).filter(models.UserExperiences.id == experience_id).first()
+    return (
+        db.query(models.UserExperiences)
+        .filter(models.UserExperiences.id == experience_id)
+        .first()
+    )
+
 
 def create_user_experience(db: Session, user_experience: schemas.UserExperiencesCreate):
     db_user_experience = models.UserExperiences(**user_experience.dict())
@@ -70,9 +93,15 @@ def create_user_experience(db: Session, user_experience: schemas.UserExperiences
     db.refresh(db_user_experience)
     return db_user_experience
 
+
 # For UserExpertises
 def get_user_expertise(db: Session, expertise_id: int):
-    return db.query(models.UserExpertises).filter(models.UserExpertises.id == expertise_id).first()
+    return (
+        db.query(models.UserExpertises)
+        .filter(models.UserExpertises.id == expertise_id)
+        .first()
+    )
+
 
 def create_user_expertise(db: Session, user_expertise: schemas.UserExpertisesCreate):
     db_user_expertise = models.UserExpertises(**user_expertise.dict())
@@ -81,9 +110,15 @@ def create_user_expertise(db: Session, user_expertise: schemas.UserExpertisesCre
     db.refresh(db_user_expertise)
     return db_user_expertise
 
+
 # For UserInterests
 def get_user_interest(db: Session, interest_id: int):
-    return db.query(models.UserInterests).filter(models.UserInterests.id == interest_id).first()
+    return (
+        db.query(models.UserInterests)
+        .filter(models.UserInterests.id == interest_id)
+        .first()
+    )
+
 
 def create_user_interest(db: Session, user_interest: schemas.UserInterestsCreate):
     db_user_interest = models.UserInterests(**user_interest.dict())
@@ -92,9 +127,15 @@ def create_user_interest(db: Session, user_interest: schemas.UserInterestsCreate
     db.refresh(db_user_interest)
     return db_user_interest
 
+
 # For StudySessions
 def get_study_session(db: Session, session_id: int):
-    return db.query(models.StudySessions).filter(models.StudySessions.id == session_id).first()
+    return (
+        db.query(models.StudySessions)
+        .filter(models.StudySessions.id == session_id)
+        .first()
+    )
+
 
 def create_study_session(db: Session, study_session: schemas.StudySessionsCreate):
     db_study_session = models.StudySessions(**study_session.dict())
@@ -103,9 +144,11 @@ def create_study_session(db: Session, study_session: schemas.StudySessionsCreate
     db.refresh(db_study_session)
     return db_study_session
 
+
 # For Likes
 def get_like(db: Session, like_id: int):
     return db.query(models.Likes).filter(models.Likes.id == like_id).first()
+
 
 def create_like(db: Session, like: schemas.LikesCreate):
     db_like = models.Likes(**like.dict())
