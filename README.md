@@ -62,7 +62,7 @@ psql -U postgres
 ```
 \dt
 ```
-## テーブル運用
+## テーブルの運用
 - テーブルの変更を行いたい場合は`./backend/fastapi/migration/models.py`に移動して、編集を行う
 - `./backend`に移動して、アプリコンテナに入る
 ```
