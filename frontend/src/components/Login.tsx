@@ -1,31 +1,36 @@
-function Login() {
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { auth, provider } from "../firebase";
+
+const Login: React.FC = () => {
+  const navigate = useNavigate();
+  const [error, setError] = useState<string>("");
+
+  const handleLogin = async (event: React.MouseEvent<HTMLButtonElement>) => {
+    try {
+      await auth.signInWithPopup(provider);
+      navigate("/");
+    } catch (error) {
+      console.log(error);
+      setError(error.message);
+    }
+  };
+
   return (
     <>
       <div className="container p-5">
         <div className="d-flex my-5">
           <div className="col-12 mt-5 border border-dark p-5 rounded">
             <h3 className="mb-5">ログイン</h3>
-
-            <div className="mb-5">
-              <input
-                type="text"
-                className="form-control"
-                placeholder="メールアドレスを入力しでください"
-              />
-            </div>
-
-            <div className="mt-1 mb-4">
-              <input
-                type="text"
-                className="form-control"
-                placeholder="パスワードを入力してください"
-              />
-            </div>
-
             <div className="d-flex">
               <div className="ml-5 ml-auto mr-5 mt-4">
-                <button type="button" className="btn btn-primary">
-                  ログイン
+                {error && <p style={{ color: "red" }}>{error}</p>}
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  onClick={handleLogin}
+                >
+                  Googleログイン
                 </button>
               </div>
             </div>
@@ -34,6 +39,6 @@ function Login() {
       </div>
     </>
   );
-}
+};
 
 export default Login;
