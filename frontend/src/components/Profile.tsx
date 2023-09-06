@@ -1,5 +1,6 @@
 import { useCallback, useState } from "react";
 import log1 from "../img/log1.png";
+
 function Profile() {
   const [textName, setNameText] = useState("");
   const [textMail, setMailText] = useState("");
@@ -9,10 +10,17 @@ function Profile() {
   const [textInterest, setInterestText] = useState("");
   const [textBusiness, setBusinessText] = useState("");
   const [textGood, setGoodText] = useState("");
+  const [chenge, setChenge] = useState(true);
+
+  const handleEdit = useCallback(() => {
+    setChenge((prevchenge) => !prevchenge);
+  }, []);
 
   const nameChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setNameText(e.target.value.trim());
   }, []);
+  console.log();
+
   const mailChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setMailText(e.target.value.trim());
   }, []);
@@ -55,80 +63,122 @@ function Profile() {
           <div className="col-8">
             <div className="mt-5 mb-5 d-flex">
               <p className=" mb-1">名前</p>
-              <input
-                type="text"
-                className="form-control w-75 ml-auto"
-                value={textName}
-                onChange={nameChange}
-              />
+              {chenge ? (
+                <input
+                  type="text"
+                  className="form-control w-75 ml-auto"
+                  value={textName}
+                  onChange={nameChange}
+                />
+              ) : (
+                <p className="text-center w-75 ml-auto">{textName}</p>
+              )}
             </div>
             <div className="mb-5 d-flex">
               <p className=" mb-1">メールアドレス:</p>
-              <input
-                type="text"
-                className="form-control w-75 ml-auto"
-                value={textMail}
-                onChange={mailChange}
-              />
+
+              {chenge ? (
+                <input
+                  type="text"
+                  className="form-control w-75 ml-auto"
+                  value={textMail}
+                  onChange={mailChange}
+                />
+              ) : (
+                <p className="text-center w-75 ml-auto">{textMail}</p>
+              )}
             </div>
             <div className="mb-5 d-flex">
               <p className=" mb-1">ひとこと</p>
-              <input
-                type="text"
-                className="form-control w-75 ml-auto"
-                value={textJoin}
-                onChange={wordChange}
-              />
+
+              {chenge ? (
+                <input
+                  type="text"
+                  className="form-control w-75 ml-auto"
+                  value={textWord}
+                  onChange={wordChange}
+                />
+              ) : (
+                <p className="text-center w-75 ml-auto">{textWord}</p>
+              )}
             </div>
             <div className="mb-5 d-flex">
               <p className=" mb-1">入社年数</p>
-              <input
-                type="text"
-                className="form-control w-75 ml-auto"
-                value={textWord}
-                onChange={joinChange}
-              />
+
+              {chenge ? (
+                <input
+                  type="text"
+                  className="form-control w-75 ml-auto"
+                  value={textJoin}
+                  onChange={joinChange}
+                />
+              ) : (
+                <p className="text-center w-75 ml-auto">{textJoin}</p>
+              )}
             </div>
             <div className="mb-5 d-flex">
               <p className=" mb-1">所属先</p>
-              <input
-                type="text"
-                className="form-control w-75 ml-auto"
-                value={textAff}
-                onChange={AffChange}
-              />
+
+              {chenge ? (
+                <input
+                  type="text"
+                  className="form-control w-75 ml-auto"
+                  value={textAff}
+                  onChange={AffChange}
+                />
+              ) : (
+                <p className="text-center w-75 ml-auto">{textAff}</p>
+              )}
             </div>
             <div className="mb-5 d-flex">
               <p className=" mb-1">興味のある技術</p>
-              <input
-                type="text"
-                className="form-control w-75 ml-auto"
-                value={textInterest}
-                onChange={interestChange}
-              />
+
+              {chenge ? (
+                <input
+                  type="text"
+                  className="form-control w-75 ml-auto"
+                  value={textInterest}
+                  onChange={interestChange}
+                />
+              ) : (
+                <p className="text-center w-75 ml-auto">{textInterest}</p>
+              )}
             </div>
             <div className="mb-5 d-flex">
               <p className=" mb-1">業務経験のある技術</p>
-              <input
-                type="text"
-                className="form-control w-75 ml-auto"
-                value={textBusiness}
-                onChange={businessChange}
-              />
+
+              {chenge ? (
+                <input
+                  type="text"
+                  className="form-control w-75 ml-auto"
+                  value={textBusiness}
+                  onChange={businessChange}
+                />
+              ) : (
+                <p className="text-center w-75 ml-auto">{textBusiness}</p>
+              )}
             </div>
             <div className="mb-5 d-flex">
               <p className=" mb-1">得意な技術</p>
-              <input
-                type="text"
-                className="form-control w-75 ml-auto"
-                value={textGood}
-                onChange={goodChange}
-              />
+
+              {chenge ? (
+                <input
+                  type="text"
+                  className="form-control w-75 ml-auto"
+                  value={textGood}
+                  onChange={goodChange}
+                />
+              ) : (
+                <p className="text-center w-75 ml-auto">{textGood}</p>
+              )}
             </div>
 
             <div className="d-flex">
-              <button className="ml-auto mr-5 mt-4 btn btn-primary">
-                編集
+              <button
+                className="ml-auto mr-5 mb-5 mt-4 btn btn-primary"
+                onClick={handleEdit}
+              >
+                {chenge ? "完了" : "編集"}
               </button>
             </div>
           </div>
