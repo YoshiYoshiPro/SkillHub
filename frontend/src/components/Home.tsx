@@ -53,29 +53,6 @@ function Home() {
 
   const trending_technologies = ["SolidJS", "Three.JS", "Golang"];
 
-  const tmp_users = [
-    {
-      id: "111111",
-      name: "テスト男",
-      icon_url: "http://localhost:3000/logo192.png",
-    },
-    {
-      id: "222222",
-      name: "テスト女",
-      icon_url: "http://localhost:3000/logo192.png",
-    },
-    {
-      id: "333333",
-      name: "テスト爺",
-      icon_url: "http://localhost:3000/logo192.png",
-    },
-    {
-      id: "444444",
-      name: "テスト婆",
-      icon_url: "http://localhost:3000/logo192.png",
-    },
-  ];
-
   const search_tag = (tag: string) => {
     axios.get('http://localhost:8000/search-tag/' + tag)
     .then((res) => {
