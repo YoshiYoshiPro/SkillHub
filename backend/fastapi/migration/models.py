@@ -17,7 +17,7 @@ class Users(BaseModel):
     """
 
     __tablename__ = "users"
-    id = Column("id", String, primary_key=True, autoincrement=True)
+    id = Column("id", String, primary_key=True)
     created_at = Column(
         "created_at",
         DateTime,
@@ -54,12 +54,12 @@ class UserDetail(BaseModel):
 class Technologies(BaseModel):
     """
     技術テーブル
-    technology_id   : 主キー
+    id   : 主キー
     name : 技術名
     """
 
     __tablename__ = "technologies"
-    id = Column("technology_id", Integer, primary_key=True, autoincrement=True)
+    id = Column("id", Integer, primary_key=True, autoincrement=True)
     name = Column("name", String(256))
 
 
@@ -68,16 +68,14 @@ class UserExperiences(BaseModel):
     ユーザの業務経験テーブル
     id              : 主キー
     user_id         : ユーザ外部キー
-    technology_id   : 技術外部キー
+    id   : 技術外部キー
     experience_years: 経験年数
     """
 
     __tablename__ = "user_experiences"
     id = Column("id", Integer, primary_key=True, autoincrement=True)
     user_id = Column("user_id", String, ForeignKey("users.id"))
-    technology_id = Column(
-        "technology_id", Integer, ForeignKey("technologies.technology_id")
-    )
+    technology_id = Column("technology_id", Integer, ForeignKey("technologies.id"))
     experience_years = Column("experience_years", Integer)
 
 
@@ -86,14 +84,14 @@ class UserExpertises(BaseModel):
     ユーザの得意な技術テーブル
     id              : 主キー
     user_id         : ユーザ外部キー
-    technology_id   : 技術外部キー
+    id   : 技術外部キー
     expertise_years: 経験年数
     """
 
     __tablename__ = "user_expertises"
     id = Column("id", Integer, primary_key=True, autoincrement=True)
     user_id = Column("user_id", String, ForeignKey("users.id"))
-    technology_id = Column("technology_id", ForeignKey("technologies.technology_id"))
+    technology_id = Column("technology_id", ForeignKey("technologies.id"))
     expertise_years = Column("expertise_years", Integer)
 
 
@@ -102,14 +100,14 @@ class UserInterests(BaseModel):
     ユーザの得意な技術テーブル
     id              : 主キー
     user_id         : ユーザ外部キー
-    technology_id   : 技術外部キー
+    id   : 技術外部キー
     interest_years: 経験年数
     """
 
     __tablename__ = "user_interests"
     id = Column("id", Integer, primary_key=True, autoincrement=True)
     user_id = Column("user_id", String, ForeignKey("users.id"))
-    technology_id = Column("technology_id", ForeignKey("technologies.technology_id"))
+    technology_id = Column("technology_id", ForeignKey("technologies.id"))
     interest_years = Column("interest_years", Integer)
 
 
@@ -117,7 +115,7 @@ class StudySessions(BaseModel):
     """
     勉強会テーブル
     id           : 主キー
-    technology_id: 技術外部キー
+    id: 技術外部キー
     content : 内容
     date         : 開催日時
     created_at   : 投稿された日時
@@ -125,7 +123,7 @@ class StudySessions(BaseModel):
 
     __tablename__ = "study_sessions"
     id = Column("id", Integer, primary_key=True, autoincrement=True)
-    technology_id = Column("technology_id", ForeignKey("technologies.technology_id"))
+    technology_id = Column("technology_id", ForeignKey("technologies.id"))
     content = Column("content", String(256))
     date = Column("date", DateTime, nullable=False)
     created_at = Column(
