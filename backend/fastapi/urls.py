@@ -18,7 +18,7 @@ app.add_api_route('/get-trend-tecs/', get_trend_tecs)
 # 技術サジェスト取得リクエスト
 app.add_api_route('/get-suggested-tecs/{tec_substring}', get_suggested_tecs)
 
-<
+
 
 # プロフィール情報取得リクエスト
 app.add_api_route('/get-profile/{user_id}', get_user_profile)
@@ -40,3 +40,9 @@ app.add_api_route('/get-profile/{user_id}', get_user_profile, methods=['GET'])
 
 # 特定のユーザーのプロフィール情報を編集するリクエスト
 app.add_api_route('/update-profile/{user_id}', update_user_profile, methods=['POST'])
+
+# 勉強会参加したいリクエスト（いいね機能）
+app.add_api_route('/update-like/{session_id}', update_like, methods=['POST'])
+
+# 勉強会やっぱり参加したくないリクエスト（いいね取り消し機能）
+app.add_api_route('/update-not-like/{session_id}', update_not_like, methods=['POST'])

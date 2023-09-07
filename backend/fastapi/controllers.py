@@ -160,11 +160,11 @@ def get_trend_tecs(request: Request):
 def get_suggested_tecs(request: Request, tec_substring):
     tmp_tecs = ["Java", "JavaScript", "SolidJS", "Three.JS", "Golang"]
 
-    
-    
-    
-    
-    
+
+
+
+
+
     return {
         "tecs": [{"id": 1, "name": tec_name} for tec_name in tmp_tecs if tec_substring in tec_name],
     }
@@ -277,7 +277,36 @@ def update_user_profile(
             db.rollback()
             raise HTTPException(status_code=500, detail="データベースエラー: {}".format(str(e)))
 
-    # except Exception as e:
-    #     # エラーハンドリング
-    #     db.rollback()  # ロールバックしてトランザクションを取り消す
-    #     raise HTTPException(status_code=500, detail="Internal Server Error")
+
+def update_like(
+    user_id: int,
+    study_session_id: int,
+    db: Session = Depends(get_db)
+):
+    # Likes モデルの新しいインスタンスを作成し、必要な値を設定します
+    new_like = models.Likes(user_id=user_id, study_session_id=study_session_id)
+
+    # データベースに新しいレコードを追加
+    db.add(new_like)
+    db.commit()
+
+    # レスポンスなどの適切な処理を行います
+    return {"message": "Liked successfully"}
+
+
+def update_not_like(
+    user_id: int,
+    study_session_id: int,
+    db: Session = Depends(get_db)
+):
+    # Likes テーブルから削除対象のレコードをクエリ
+    like_to_delete = db.query(models.Likes).filter_by(user_id=user_id, study_session_id=study_session_id).first()
+
+    if like_to_delete:
+        # レコードが見つかった場合、削除
+        db.delete(like_to_delete)
+        db.commit()
+        return {"message": "Not liked successfully"}
+    else:
+        # レコードが見つからなかった場合、エラーレスポンスなど適切な処理を行う
+        return {"message": "Like not found"}
