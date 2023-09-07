@@ -35,7 +35,7 @@ interface GetSuggestedTagsResponse {
 
 function Home() {
   const navigate = useNavigate();
-  const { user } = useAuthContext();
+  const { user } = useAuthContext(); // ユーザー情報の取得
 
   // ログアウト用の関数
   const handleLogout = () => {
