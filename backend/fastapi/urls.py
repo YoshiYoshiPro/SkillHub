@@ -12,7 +12,7 @@ app.add_api_route("/data", get_data)
 # 技術検索結果取得リクエスト
 app.add_api_route('/search-tec/{tec_id}', get_tec_result)
 
-# 技術トレンド取得リクエスト
+# 技術トレンド取得リクエス
 app.add_api_route('/get-trend-tecs/', get_trend_tecs)
 
 # 技術サジェスト取得リクエスト
