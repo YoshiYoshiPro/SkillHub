@@ -66,7 +66,7 @@ function Profile() {
   }, []);
   const edit_complete = () => {
     setIsEditing(false);
-    axios.post('http://localhost:8000/update-profile/1', {
+    axios.post('http://localhost:8000/update-profile/' + user?.uid, {
       edited_sns_link: edited_sns_link,
       edited_comment: edited_comment,
       edited_join_date: edited_join_date,
