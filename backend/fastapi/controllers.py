@@ -196,6 +196,21 @@ def get_user_profile(user_id: int, db: Session = Depends(get_db)):
     if user is None:
         raise HTTPException(status_code=404, detail="User not found")
 
+    interests = []
+    for interest in db.query(models.UserInterests).filter(models.UserInterests.user_id == user_id).all():
+        technology = crud.get_technology(db, interest.technology_id)
+        interests.append({"id": technology.id, "name": technology.name})
+
+    expertises = []
+    for expertise in db.query(models.UserExpertises).filter(models.UserExpertises.user_id == user_id).all():
+        technology = crud.get_technology(db, expertise.technology_id)
+        expertises.append({"id": technology.id, "name": technology.name, "years": expertise.expertise_years})
+
+    experiences = []
+    for experience in db.query(models.UserExperiences).filter(models.UserExperiences.user_id == user_id).all():
+        technology = crud.get_technology(db, experience.technology_id)
+        experiences.append({"id": technology.id, "name": technology.name, "years": experience.experience_years})
+
     # プロフィール情報を要求されたフォーマットに整形
     profile_data = {
         "name": user.name,
@@ -203,9 +218,9 @@ def get_user_profile(user_id: int, db: Session = Depends(get_db)):
         "comment": user.comment,
         "join_date": str(user.join_date),
         "department": user.department,
-        # "interests": [{"name": interest.name} for interest in user.interests],
-        # "expertises": [{"name": expertise.name, "years": expertise.expertise_years} for expertise in user.expertises],
-        # "experiences": [{"name": experience.name, "years": experience.experience_years} for experience in user.experiences],
+        "interests": interests,
+        "expertises": expertises,
+        "experiences": experiences,
     }
     return profile_data
 

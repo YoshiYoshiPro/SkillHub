@@ -35,8 +35,7 @@ function Profile() {
   // ユーザー情報を取得
   const { user } = useAuthContext();
 
-  const [textName, setNameText] = useState("");
-  const [textMail, setMailText] = useState("");
+  const [sns_link, setSnsLink] = useState("");
   const [comment, setComment] = useState("");
   const [join_date, setJoinDate] = useState("1900-12-17");
   const [department, setDepartment] = useState("");
@@ -44,8 +43,7 @@ function Profile() {
   const [expertises, setExpertises] = useState([] as {id: number, name: string, years: number}[]);
   const [experiences, setExperiences] = useState([] as {id: number, name: string, years: number}[]);
 
-  const [edited_name, setEditedName] = useState("");
-  const [edited_Mail, setEditedMail] = useState("");
+  const [edited_sns_link, setEditedSnsLink] = useState("");
   const [edited_comment, setEditedComment] = useState("");
   const [edited_join_date, setEditedJoinDate] = useState("1900-12-17");
   const [edited_department, setEditedDepartment] = useState("");
@@ -54,8 +52,7 @@ function Profile() {
   const [edited_experiences, setEditedExperiences] = useState([] as {id: number, name: string, years: number}[]);
 
   const edit_start = () => {
-    setEditedName(name);
-    setEditedMail(textMail);
+    setEditedSnsLink(sns_link);
     setEditedComment(comment);
     setEditedJoinDate(join_date);
     setEditedDepartment(department);
@@ -69,6 +66,25 @@ function Profile() {
   }, []);
   const edit_complete = useCallback(() => {
     setIsEditing(false);
+    axios.post('http://localhost:8000/update-profile/1', {
+      edited_sns_link: edited_sns_link,
+      edited_comment: edited_comment,
+      edited_join_date: edited_join_date,
+      edited_department: edited_department,
+      edited_interests: edited_interests.map(interest => interest.id),
+      edited_expertises: edited_expertises.map(expertise => [expertise.id, expertise.years]),
+      edited_experiences: edited_experiences.map(experience => [experience.id, experience.years]),
+    }).then((res) => {
+      if(res.data.is_accepted) {
+        setSnsLink(edited_sns_link);
+        setComment(edited_comment);
+        setJoinDate(edited_join_date);
+        setDepartment(edited_department);
+        setInterests(edited_interests);
+        setExpertises(edited_expertises);
+        setExperiences(edited_experiences);
+      }
+    });
   }, []);
 
   // 興味のある技術専用タグサジェストを変更する処理
@@ -110,11 +126,8 @@ function Profile() {
     });
   }, []);
 
-  const editedNameChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setEditedName(e.target.value.trim());
-  }, []);
-  const editedMailChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setEditedMail(e.target.value.trim());
+  const editedSnsLinkChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setEditedSnsLink(e.target.value.trim());
   }, []);
   const editedCommentChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setEditedComment(e.target.value.trim());
@@ -123,9 +136,9 @@ function Profile() {
     console.log(e.target.value.trim());
     setEditedJoinDate(e.target.value.trim());
   }, []);
-  const editedDepartmentChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+  const editedDepartmentChange = ((e: React.ChangeEvent<HTMLInputElement>) => {
     setEditedDepartment(e.target.value.trim());
-  }, []);
+  });
 
   // 編集中に新たにタグを追加する処理
   const editedInterestsAdd = useCallback((suggested_tec: {id: number, name: string}) => {
@@ -175,7 +188,7 @@ function Profile() {
     .then((res) => {
       const get_profile_res: GetProfileResponse = res.data;
       console.log(get_profile_res);
-      setName(get_profile_res.name);
+      setSnsLink(get_profile_res.sns_link);
       setIconUrl(get_profile_res.icon_url);
       setComment(get_profile_res.comment);
       setJoinDate(get_profile_res.join_date);
@@ -203,20 +216,24 @@ function Profile() {
           <div className="col-8">
             <div className="mt-5 mb-5 d-flex">
               <p className=" mb-1">名前</p>
-
-              {is_editing ? (
-                <p className="text-center w-75 ml-auto">{user?.displayName}</p>
-              ) : (
-                <p className="text-center w-75 ml-auto">{textName}</p>
-              )}
+              <p className="text-center w-75 ml-auto">{user?.displayName}</p>
             </div>
             <div className="mb-5 d-flex">
               <p className=" mb-1">メールアドレス</p>
+              <p className="text-center w-75 ml-auto">{user?.email}</p>
+            </div>
+            <div className="mb-5 d-flex">
+              <p className=" mb-1">SNSリンク</p>
 
               {is_editing ? (
-                <p className="text-center w-75 ml-auto">{user?.email}</p>
+                <input
+                  type="text"
+                  className="form-control w-75 ml-auto"
+                  value={edited_sns_link}
+                  onChange={editedSnsLinkChange}
+                />
               ) : (
-                <p className="text-center w-75 ml-auto">{textMail}</p>
+                <p className="text-center w-75 ml-auto">{sns_link}</p>
               )}
             </div>
             <div className="mb-5 d-flex">
@@ -335,7 +352,7 @@ function Profile() {
                     experiences.map((experience, index) => {
                       return <>
                         { index > 0 && <p className="">,</p> }
-                        <p className="">{experience.name}</p>
+                        <p className="">{experience.name + "(" + experience.years + "年目)"}</p>
                       </>
                     })
                   }
@@ -376,7 +393,7 @@ function Profile() {
                     expertises.map((expertise, index) => {
                       return <>
                         { index > 0 && <p className="">,</p> }
-                        <p className="">{expertise.name}</p>
+                        <p className="">{expertise.name + "(" + expertise.years + "年目)"}</p>
                       </>
                     })
                   }
@@ -388,7 +405,7 @@ function Profile() {
               { is_editing ?
                 <>
                   <button
-                    className="ml-auto mr-5 mb-5 mt-4 btn btn-primary"
+                    className="ml-auto mr-5 mb-5 mt-4 btn btn-secondary"
                     onClick={edit_end}
                   >
                     編集やめる

@@ -47,4 +47,4 @@ app.add_api_route('/update-like/{session_id}', update_like, methods=['POST'])
 app.add_api_route('/update-not-like/{session_id}', update_not_like, methods=['POST'])
 
 # タイムラインの更新リクエスト
-app.add_api_route('/update-timeline', timeline , method=['GET'])
+app.add_api_route('/update-timeline', timeline , methods=['GET'])
