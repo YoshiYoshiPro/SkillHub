@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { auth, provider } from "../firebase";
-import { signInWithPopup } from "firebase/auth";
+import { signInWithPopup, getAuth, getIdToken } from "firebase/auth";
+
+const FASTAPI_ENDPOINT = "http://localhost:8000";
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
@@ -9,7 +11,11 @@ const Login: React.FC = () => {
 
   const handleLogin = async (event: React.MouseEvent<HTMLButtonElement>) => {
     try {
-      await signInWithPopup(auth, provider);
+      const result = await signInWithPopup(auth, provider);
+      const token = await getIdToken(result.user);
+      console.log("ID Token:", token);
+      // FastAPI エンドポイントにリクエストを送信
+      await sendRequestToBackend(token);
       navigate("/");
     } catch (error) {
       if (error instanceof Error) {
@@ -22,6 +28,17 @@ const Login: React.FC = () => {
         setError("An unknown error occurred.");
       }
     }
+  };
+
+  const sendRequestToBackend = async (token: string) => {
+    const response = await fetch(FASTAPI_ENDPOINT, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    const data = await response.json();
+    console.log(data);
   };
 
   return (
