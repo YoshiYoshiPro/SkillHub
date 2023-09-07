@@ -10,6 +10,7 @@ from firebase_admin import auth, credentials
 from migration import models
 from pydantic import BaseModel
 from schemas import schemas
+from sqlalchemy import desc, func
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 from starlette.middleware.cors import CORSMiddleware
@@ -152,10 +153,7 @@ def get_tec_result(request: Request, tec_id: int):
 
 def get_suggested_tecs(request: Request, tec_substring):
     tmp_tecs = ["Java", "JavaScript", "SolidJS", "Three.JS", "Golang"]
-<<<<<<< HEAD
 
-=======
->>>>>>> 8590619247536ab835c215af3bc8c9a91c0a330b
     return {
         "tecs": [
             {"id": 1, "name": tec_name}
@@ -192,7 +190,7 @@ def get_all_users(db: Session = Depends(get_db)):
     return users
 
 
-def get_user_profile(user_id: int, db: Session = Depends(get_db)):
+def get_user_profile(user_id: str, db: Session = Depends(get_db)):
     user = crud.get_user_profile(db, user_id)
     if user is None:
         raise HTTPException(status_code=404, detail="User not found")
@@ -227,7 +225,7 @@ def get_user_profile(user_id: int, db: Session = Depends(get_db)):
 
 
 def update_user_profile(
-    user_id: int,
+    user_id: str,
     edited_sns_link: str = Body(..., description="SNSリンク"),
     edited_comment: str = Body(..., description="コメント"),
     edited_join_date: str = Body(..., description="入社日"),

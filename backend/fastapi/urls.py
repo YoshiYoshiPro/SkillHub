@@ -14,11 +14,6 @@ app.add_api_route("/data", get_data)
 app.add_api_route("/search-tec/{tec_id}", get_tec_result)
 
 
-
-# 技術トレンド取得リクエスト
-app.add_api_route("/get-trend-tecs/", get_trend_tecs)
-
-
 # 技術サジェスト取得リクエスト
 app.add_api_route("/get-suggested-tecs/{tec_substring}", get_suggested_tecs)
 

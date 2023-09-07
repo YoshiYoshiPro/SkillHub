@@ -18,7 +18,6 @@ const Login: React.FC = () => {
       console.log("ID Token:", token);
       // FastAPI エンドポイントにリクエストを送信
       await sendRequestToBackend(token);
-      navigate("/");
     } catch (error) {
       if (error instanceof Error) {
         // 型チェック
@@ -30,6 +29,7 @@ const Login: React.FC = () => {
         setError("An unknown error occurred.");
       }
     }
+    navigate("/");
   };
 
   const sendRequestToBackend = async (token: string) => {
