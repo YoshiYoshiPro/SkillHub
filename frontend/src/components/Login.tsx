@@ -32,7 +32,7 @@ const Login: React.FC = () => {
 
   const sendRequestToBackend = async (token: string) => {
     const response = await fetch(FASTAPI_ENDPOINT, {
-      method: "GET",
+      method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,
       },
