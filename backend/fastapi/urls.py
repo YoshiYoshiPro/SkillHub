@@ -14,6 +14,7 @@ app.add_api_route("/data", get_data)
 app.add_api_route("/search-tec/{tec_id}", get_tec_result)
 
 
+
 # 技術サジェスト取得リクエスト
 app.add_api_route("/get-suggested-tecs/{tec_substring}", get_suggested_tecs)
 
@@ -50,3 +51,6 @@ app.add_api_route('/update-timeline', timeline , methods=['GET'])
 
 # トレンド技術取得リクエスト
 app.add_api_route('/get-trend-tec', get_trend , methods=['GET'])
+
+# 技術人検索リクエスト
+app.add_api_route('/tec-search/{tec_id}', get_tech_users , methods=['GET'])
