@@ -2,9 +2,8 @@ from migration import models
 from schemas import schemas
 from sqlalchemy.orm import Session
 
-'''from ..migration import models
-from ..schemas import schemas'''
-
+"""from ..migration import models
+from ..schemas import schemas"""
 
 
 # For Users
@@ -12,12 +11,12 @@ def get_user(db: Session, user_id: int):
     return db.query(models.Users).filter(models.Users.id == user_id).first()
 
 
-def create_user(db: Session, user: schemas.UsersCreate):
-    db_user = models.Users(**user.dict())
-    db.add(db_user)
-    db.commit()
-    db.refresh(db_user)
-    return db_user
+# def create_user(db: Session, user: schemas.UsersCreate):
+#     db_user = models.Users(**user.dict())
+#     db.add(db_user)
+#     db.commit()
+#     db.refresh(db_user)
+#     return db_user
 
 
 # For UserActive
@@ -38,7 +37,6 @@ def create_user_active(db: Session, user_active: schemas.UserActiveCreate):
 def get_all_users(db: Session):
     users = db.query(models.Users).all()
     return users
-
 
 
 # For UserLeave
@@ -168,7 +166,10 @@ def create_like(db: Session, like: schemas.LikesCreate):
 
 
 def get_user_profile(db: Session, user_id: int):
-    return db.query(models.UserDetail).filter(models.UserDetail.user_id == user_id).first()
+    return (
+        db.query(models.UserDetail).filter(models.UserDetail.user_id == user_id).first()
+    )
+
 
 # ユーザの興味を更新する関数
 def update_user_interest(db: Session, user_id: int, technology_id: int):
@@ -184,9 +185,9 @@ def update_user_interest(db: Session, user_id: int, technology_id: int):
         user_interest.technology_id = technology_id  # 技術を更新（適切な処理に置き換えてください）
         user_interest.interest_years += 1  # 興味年数を更新（適切な処理に置き換えてください）
 
+
 # ユーザの専門性を更新する関数
 def update_user_expertise(db: Session, user_id: int, technology_id: int, years: int):
-
     if technology_id:
         # ユーザの専門性を更新
         user_expertise = models.UserExpertises(
@@ -196,9 +197,9 @@ def update_user_expertise(db: Session, user_id: int, technology_id: int, years: 
         )
         db.add(user_expertise)
 
+
 # ユーザの経験を更新する関数
 def update_user_experience(db: Session, user_id: int, technology_id: int, years: int):
-
     if technology_id:
         # ユーザの経験を更新
         user_experience = models.UserExperiences(
