@@ -1,7 +1,11 @@
 import { useCallback, useState } from "react";
+import { useAuthContext } from "../context/AuthContext";
 import log1 from "../img/log1.png";
 
 function Profile() {
+  // ユーザー情報を取得
+  const { user } = useAuthContext();
+
   const [textName, setNameText] = useState("");
   const [textMail, setMailText] = useState("");
   const [textJoin, setJoinText] = useState("");
@@ -55,7 +59,7 @@ function Profile() {
         <div className="d-flex">
           <div className="col-4 mt-5">
             <img
-              src={log1}
+              src={user?.photoURL || log1}
               className="rounded-circle border border-dark"
               alt="アイコン"
             />
@@ -64,26 +68,16 @@ function Profile() {
             <div className="mt-5 mb-5 d-flex">
               <p className=" mb-1">名前</p>
               {chenge ? (
-                <input
-                  type="text"
-                  className="form-control w-75 ml-auto"
-                  value={textName}
-                  onChange={nameChange}
-                />
+                <p className="text-center w-75 ml-auto">{user?.displayName}</p>
               ) : (
                 <p className="text-center w-75 ml-auto">{textName}</p>
               )}
             </div>
             <div className="mb-5 d-flex">
-              <p className=" mb-1">メールアドレス:</p>
+              <p className=" mb-1">メールアドレス</p>
 
               {chenge ? (
-                <input
-                  type="text"
-                  className="form-control w-75 ml-auto"
-                  value={textMail}
-                  onChange={mailChange}
-                />
+                <p className="text-center w-75 ml-auto">{user?.email}</p>
               ) : (
                 <p className="text-center w-75 ml-auto">{textMail}</p>
               )}
