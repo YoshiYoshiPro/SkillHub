@@ -9,14 +9,21 @@ app.add_api_route("/data", get_data)
 # # プロフィールの表示
 # app.add_api_route('/get-profile',get_profile)
 
-# タグ検索結果取得リクエスト
+
+# 技術検索結果取得リクエスト
 app.add_api_route("/search-tec/{tec_id}", get_tec_result)
 
-# タグサジェスト取得リクエスト
+
+# 技術トレンド取得リクエスト
+app.add_api_route("/get-trend-tecs/", get_trend_tecs)
+
+# 技術サジェスト取得リクエスト
 app.add_api_route("/get-suggested-tecs/{tec_substring}", get_suggested_tecs)
 
+
 # プロフィール情報取得リクエスト
-# app.add_api_route('/get-profile/{user_id}', get_profile)
+app.add_api_route("/get-profile/{user_id}", get_user_profile)
+
 
 # 指定のuser_idを持つユーザテーブルを取得するリクエスト
 app.add_api_route("/users/{user_id}", get_user_by_id, methods=["GET"])

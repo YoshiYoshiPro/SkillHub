@@ -9,6 +9,7 @@ from firebase_admin import auth, credentials
 from migration import models
 from pydantic import BaseModel
 from schemas import schemas
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 from starlette.middleware.cors import CORSMiddleware
 from starlette.requests import Request
@@ -148,16 +149,25 @@ def get_tec_result(request: Request, tec_id: int):
     }
 
 
+def get_trend_tecs(request: Request):
+    tmp_tecs = ["TypeScript", "SolidJS", "Three.JS"]
+    return {
+        "tecs": [{"id": 1, "name": tec_name} for tec_name in tmp_tecs],
+    }
+
+
 def get_suggested_tecs(request: Request, tec_substring):
     tmp_tecs = ["Java", "JavaScript", "SolidJS", "Three.JS", "Golang"]
-
     return {
-        "suggested_tecs": [
+        "tecs": [
             {"id": 1, "name": tec_name}
             for tec_name in tmp_tecs
             if tec_substring in tec_name
         ],
     }
+
+
+# def get_user_by_id(user_id: int, db: Session = Depends(get_db)):
 
 
 def get_user_by_id(request: Request, user_id: int):
@@ -214,60 +224,67 @@ def update_user_profile(
     edited_experiences: List[Tuple[int, int]] = Body(..., description="経験のIDと年数のリスト"),
     db: Session = Depends(get_db),
 ):
+    # try:
+    # ユーザープロファイルの取得
+    user_profile = crud.get_user_profile(db, user_id)
+
+    # プロファイル情報の更新
+    user_profile.sns_link = edited_sns_link
+    user_profile.comment = edited_comment
+    user_profile.join_date = edited_join_date
+    user_profile.department = edited_department
+
+    # 興味、専門性、経験の更新
+    # データベースから関連データを削除し、新しいデータを追加
+    db.query(models.UserInterests).filter(
+        models.UserInterests.user_id == user_id
+    ).delete()
+    db.query(models.UserExpertises).filter(
+        models.UserExpertises.user_id == user_id
+    ).delete()
+    db.query(models.UserExperiences).filter(
+        models.UserExperiences.user_id == user_id
+    ).delete()
+
+    for interest_id in edited_interests:
+        user_interest = models.UserInterests(
+            user_id=user_id,
+            technology_id=interest_id,
+            interest_years=1,  # 適切な値を設定してください
+        )
+        db.add(user_interest)
+
+    for expertise in edited_expertises:
+        technology_id, expertise_years = expertise
+        user_expertise = models.UserExpertises(
+            user_id=user_id,
+            technology_id=technology_id,
+            expertise_years=expertise_years,
+        )
+        db.add(user_expertise)
+
+    for experience in edited_experiences:
+        technology_id, experience_years = experience
+        user_experience = models.UserExperiences(
+            user_id=user_id,
+            technology_id=technology_id,
+            experience_years=experience_years,
+        )
+        db.add(user_experience)
+
     try:
-        # ユーザープロファイルの取得
-        user_profile = crud.get_user_profile(db, user_id)
-        # if user_profile is None:
-        #     raise HTTPException(status_code=404, detail="User not found")
-
-        # プロファイル情報の更新
-        user_profile.sns_link = edited_sns_link
-        user_profile.comment = edited_comment
-        user_profile.join_date = edited_join_date
-        user_profile.department = edited_department
-
-        # 興味、専門性、経験の更新
-        # データベースから関連データを削除し、新しいデータを追加
-        db.query(models.UserInterests).filter(
-            models.UserInterests.user_id == user_id
-        ).delete()
-        db.query(models.UserExpertises).filter(
-            models.UserExpertises.user_id == user_id
-        ).delete()
-        db.query(models.UserExperiences).filter(
-            models.UserExperiences.user_id == user_id
-        ).delete()
-
-        for interest_id in edited_interests:
-            user_interest = models.UserInterests(
-                user_id=user_id,
-                technology_id=interest_id,
-                interest_years=1,  # 適切な値を設定してください
-            )
-            db.add(user_interest)
-
-        for expertise in edited_expertises:
-            technology_id, expertise_years = expertise
-            user_expertise = models.UserExpertises(
-                user_id=user_id,
-                technology_id=technology_id,
-                expertise_years=expertise_years,
-            )
-            db.add(user_expertise)
-
-        for experience in edited_experiences:
-            technology_id, experience_years = experience
-            user_experience = models.UserExpertises(
-                user_id=user_id,
-                technology_id=technology_id,
-                experience_years=experience_years,
-            )
-            db.add(user_experience)
-
+        # 既存のコード
         db.commit()
         return {"is_accepted": True}
-
+    except IntegrityError as e:
+        db.rollback()  # ロールバック
+        raise HTTPException(status_code=400, detail="一意制約違反エラー: {}".format(str(e)))
     except Exception as e:
-        # エラーハンドリング
-        db.rollback()  # ロールバックしてトランザクションを取り消す
-        raise HTTPException(status_code=500, detail="Internal Server Error")
+        db.rollback()
+        raise HTTPException(status_code=500, detail="データベースエラー: {}".format(str(e)))
+
+
+# except Exception as e:
+#     # エラーハンドリング
+#     db.rollback()  # ロールバックしてトランザクションを取り消す
+#     raise HTTPException(status_code=500, detail="Internal Server Error")

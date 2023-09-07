@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import Modal from "react-bootstrap/Modal";
 import { ComposedChart, CartesianGrid, XAxis, YAxis, Bar } from "recharts";
@@ -29,8 +29,8 @@ interface SearchTecResponse {
   }[];
 }
 
-export interface GetSuggestedTecsResponse {
-  suggested_tecs: {id: number, name: string}[],
+export interface GetTecsResponse {
+  tecs: { id: number; name: string }[];
 }
 
 function Home() {
@@ -44,58 +44,14 @@ function Home() {
   };
 
   const [is_searching, setIsSearching] = useState(false);
-
-  const Data = [
-    {
-      name: "1年目 業務経験",
-      業務経験: 10,
-      得意な人: 10,
-      興味のある人: 10,
-    },
-    {
-      name: "2年目 業務経験",
-      業務経験: 10,
-      得意な人: 0,
-      興味のある人: 0,
-    },
-    {
-      name: "3年目 業務経験",
-      業務経験: 10,
-      得意な人: 0,
-      興味のある人: 0,
-    },
-    {
-      name: "2年目 得意な人",
-      業務経験: 0,
-      得意な人: 10,
-      興味のある人: 0,
-    },
-    {
-      name: "3年目 得意な人",
-      業務経験: 0,
-      得意な人: 22,
-      興味のある人: 0,
-    },
-    {
-      name: "4年目 得意な人",
-      業務経験: 0,
-      得意な人: 31,
-      興味のある人: 0,
-    },
-    {
-      name: "興味のある人",
-      業務経験: 0,
-      得意な人: 0,
-      興味のある人: 30,
-    },
-  ];
   const [is_searched, setIsSearched] = useState(false);
   const [tec, setTec] = useState("");
-  const [suggested_tecs, setSuggestedTecs] = useState([
-    {id: 1, name: "SolidJS"},
-    {id: 1, name: "Three.JS"},
-    {id: 1, name: "Golang"},
-  ]);
+  const [trend_tecs, setTrendTecs] = useState(
+    [] as { id: number; name: string }[]
+  );
+  const [suggested_tecs, setSuggestedTecs] = useState(
+    [] as { id: number; name: string }[]
+  );
 
   const [interests, setInterests] = useState(
     [] as { user_id: string; name: string; icon_url: string }[]
@@ -106,6 +62,47 @@ function Home() {
   const [experiences, setExperiences] = useState(
     [] as { user_id: string; name: string; icon_url: string; years: number }[]
   );
+
+  const graph_data = useCallback(() => {
+    const expertise_counter = new Map<number, number>();
+    const experience_counter = new Map<number, number>();
+
+    expertises.forEach(expertise => {
+      const expertise_count = expertise_counter.get(expertise.years);
+      if(expertise_count === undefined) expertise_counter.set(expertise.years, 1);
+      else expertise_counter.set(expertise.years, expertise_count + 1);
+    });
+    experiences.forEach(experience => {
+      const experience_count = experience_counter.get(experience.years);
+      if(experience_count === undefined) experience_counter.set(experience.years, 1);
+      else experience_counter.set(experience.years, experience_count + 1);
+    });
+
+    return [
+      {
+        name: "興味のある人",
+        業務経験: 0,
+        得意な人: 0,
+        興味のある人: interests.length,
+      },
+      ...Array.from(experience_counter).map(([years, count]) => {
+        return {
+          name: "業務経験(" + years + "年目)",
+          業務経験: count,
+          得意な人: 0,
+          興味のある人: 0,
+        }
+      }),
+      ...Array.from(expertise_counter).map(([years, count]) => {
+        return {
+          name: "得意(" + years + "年目)",
+          業務経験: 0,
+          得意な人: count,
+          興味のある人: 0,
+        }
+      })
+    ]
+  }, [interests, expertises, experiences])();
 
   const posts: SessionSuggestionPost[] = [
     {
@@ -125,9 +122,7 @@ function Home() {
     },
   ];
 
-  const trending_technologies = ["SolidJS", "Three.JS", "Golang"];
-
-  const search_tec = (tec: {id: number, name: string}) => {
+  const search_tec = (tec: { id: number; name: string }) => {
     axios
       .get("http://localhost:8000/search-tec/" + tec.id)
       .then((res) => {
@@ -149,13 +144,27 @@ function Home() {
     axios
       .get("http://localhost:8000/get-suggested-tecs/" + tec_substring)
       .then((res) => {
-        const get_suggested_tecs_res: GetSuggestedTecsResponse = res.data;
-        setSuggestedTecs(get_suggested_tecs_res.suggested_tecs);
+        const get_suggested_tecs_res: GetTecsResponse = res.data;
+        setSuggestedTecs(get_suggested_tecs_res.tecs);
       })
       .catch((err) => {
         console.log(err);
       });
   };
+
+  useEffect(() => {
+    axios
+      .get("http://localhost:8000/get-trend-tecs/")
+      .then((res) => {
+        const get_trend_tecs_res: GetTecsResponse = res.data;
+        setTrendTecs(get_trend_tecs_res.tecs);
+        setSuggestedTecs(get_trend_tecs_res.tecs);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, []);
+
   if (!user) {
     navigate("/login");
     return null;
@@ -177,7 +186,8 @@ function Home() {
                   value={tec}
                   onChange={(e) => {
                     setTec(e.target.value);
-                    get_suggested_tecs(e.target.value);
+                    if (e.target.value === "") setSuggestedTecs(trend_tecs);
+                    else get_suggested_tecs(e.target.value);
                   }}
                 />
               </div>
@@ -205,7 +215,7 @@ function Home() {
                       width={793}
                       height={500}
                       layout="vertical"
-                      data={Data}
+                      data={graph_data}
                       margin={{ top: 20, right: 60, bottom: 0, left: 150 }}
                     >
                       <XAxis type="number" />
@@ -343,9 +353,20 @@ function Home() {
                   検索
                 </button>
               </div>
+              <h4 className="mt-4 text-secondary">トレンド技術</h4>
               <div className="m-2">
-                {trending_technologies.map((techonology) => {
-                  return <h5 className="fw-bold">#{techonology}</h5>;
+                {trend_tecs.map((tec) => {
+                  return (
+                    <button
+                      className="btn btn-link"
+                      onClick={() => {
+                        search_tec(tec);
+                        setIsSearching(true);
+                      }}
+                    >
+                      #{tec.name}
+                    </button>
+                  );
                 })}
               </div>
             </div>

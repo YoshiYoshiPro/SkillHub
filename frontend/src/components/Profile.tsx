@@ -4,7 +4,7 @@ import { useParams } from "react-router-dom";
 import { useAuthContext } from "../context/AuthContext";
 import log1 from "../img/log1.png";
 
-import { GetSuggestedTecsResponse } from "./Home";
+import { GetTecsResponse } from "./Home";
 
 interface GetProfileResponse {
 	name: string,
@@ -76,8 +76,8 @@ function Profile() {
     setInterestTecSubstring(e.target.value.trim());
     axios.get('http://localhost:8000/get-suggested-tecs/' + e.target.value.trim())
     .then((res) => {
-      const get_suggested_tecs_res: GetSuggestedTecsResponse = res.data;
-      setSuggestedInterestTecs(get_suggested_tecs_res.suggested_tecs);
+      const get_suggested_tecs_res: GetTecsResponse = res.data;
+      setSuggestedInterestTecs(get_suggested_tecs_res.tecs);
     })
     .catch((err) => {
       console.log(err);
@@ -89,8 +89,8 @@ function Profile() {
     setExpertiseTecSubstring(e.target.value.trim());
     axios.get('http://localhost:8000/get-suggested-tecs/' + e.target.value.trim())
     .then((res) => {
-      const get_suggested_tecs_res: GetSuggestedTecsResponse = res.data;
-      setSuggestedExpertiseTecs(get_suggested_tecs_res.suggested_tecs);
+      const get_suggested_tecs_res: GetTecsResponse = res.data;
+      setSuggestedExpertiseTecs(get_suggested_tecs_res.tecs);
     })
     .catch((err) => {
       console.log(err);
@@ -102,8 +102,8 @@ function Profile() {
     setExperienceTecSubstring(e.target.value.trim());
     axios.get('http://localhost:8000/get-suggested-tecs/' + e.target.value.trim())
     .then((res) => {
-      const get_suggested_tecs_res: GetSuggestedTecsResponse = res.data;
-      setSuggestedExperienceTecs(get_suggested_tecs_res.suggested_tecs);
+      const get_suggested_tecs_res: GetTecsResponse = res.data;
+      setSuggestedExperienceTecs(get_suggested_tecs_res.tecs);
     })
     .catch((err) => {
       console.log(err);
