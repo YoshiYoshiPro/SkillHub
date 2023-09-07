@@ -1,17 +1,20 @@
 DOCKER_COMPOSE := docker compose
 
-run: compose/up migrate/up
+# run: up migrate/up
 
-compose/up:
+up:
 	$(DOCKER_COMPOSE) up -d
 
-compose/up-no-cache:
-	$(DOCKER_COMPOSE) up -d --no-cache
+build:
+	$(DOCKER_COMPOSE) build
 
-compose/down:
+build-no-cache:
+	$(DOCKER_COMPOSE) build --no-cache
+
+down:
 	$(DOCKER_COMPOSE) down --volumes --remove-orphans --rmi local
 
-compose/logs:
+logs:
 	$(DOCKER_COMPOSE) logs -f
 
 DATABASE_NAME := postgres-db
@@ -21,15 +24,15 @@ psql:
 
 
 
-GOOSE_DRIVER   := postgres
-GOOSE_DBSTRING ?= host=db user=root dbname=treasure_app password=p@ssword sslmode=disable
-migrate/status:
-	$(DOCKER_COMPOSE) run --rm migration status
+# GOOSE_DRIVER   := postgres
+# GOOSE_DBSTRING ?= host=db user=root dbname=treasure_app password=p@ssword sslmode=disable
+# migrate/status:
+# 	$(DOCKER_COMPOSE) run --rm migration status
 
-VERSION:=$(shell ls db/migration | awk -F"_*.sql" 'BEGIN {max=0} {split($$1, a, "_"); if(a[1]>max){max = a[1]}}END{print max+1}')
-TEMPLATE?=
-migrate/new:
-	echo '-- +goose Up' > db/migration/${VERSION}_${TEMPLATE}.sql
+# VERSION:=$(shell ls db/migration | awk -F"_*.sql" 'BEGIN {max=0} {split($$1, a, "_"); if(a[1]>max){max = a[1]}}END{print max+1}')
+# TEMPLATE?=
+# migrate/new:
+# 	echo '-- +goose Up' > db/migration/${VERSION}_${TEMPLATE}.sql
 
-migrate/up:
-	$(DOCKER_COMPOSE) run --rm migration up
+# migrate/up:
+# 	$(DOCKER_COMPOSE) run --rm migration up
