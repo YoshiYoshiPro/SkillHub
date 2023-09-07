@@ -149,16 +149,23 @@ def get_tec_result(request: Request, tec_id: int):
     }
 
 
+def get_trend_tecs(request: Request):
+    tmp_tecs = ["TypeScript", "SolidJS", "Three.JS"]
+    return {
+        "tecs": [{"id": 1, "name": tec_name} for tec_name in tmp_tecs],
+    }
+
+
 def get_suggested_tecs(request: Request, tec_substring):
     tmp_tecs = ["Java", "JavaScript", "SolidJS", "Three.JS", "Golang"]
 
     return {
-        "suggested_tecs": [{"id": 1, "name": tec_name} for tec_name in tmp_tecs if tec_substring in tec_name],
+        "tecs": [{"id": 1, "name": tec_name} for tec_name in tmp_tecs if tec_substring in tec_name],
     }
 
 
 def get_user_by_id(user_id: int, db: Session = Depends(get_db)):
-
+    return {}
 
 
 
