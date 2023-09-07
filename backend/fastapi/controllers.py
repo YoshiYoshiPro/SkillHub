@@ -1,26 +1,26 @@
+from typing import List, Tuple
 
-
-from ast import List, Tuple
-
-import uvicorn
+import firebase_admin
+from firebase_admin import auth, credentials
+from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from starlette.middleware.cors import CORSMiddleware
 from starlette.requests import Request
 
 from core.database import get_db  # ここでget_db関数をインポート
 from crud import crud
-from fastapi import APIRouter, Depends, FastAPI, HTTPException
+from fastapi import APIRouter, Body, Depends, FastAPI, HTTPException, status
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from migration import models
 from schemas import schemas
-
-'''from core import config
-from crud import crud'''
-from fastapi import Depends, FastAPI, HTTPException
 
 # from migration import database, models
 
 app = FastAPI(title="社内勉強会の開催を活発にするwebアプリ", description="社内の勉強会の予定を共有するWebアプリケーション")
 
+# Firebaseの初期化
+cred = credentials.Certificate("./serviceAccountKey.json")
+firebase_admin.initialize_app(cred)
 
 router = APIRouter()
 
@@ -32,6 +32,44 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+# リクエストボディの定義
+class Message(BaseModel):
+    name: str
+
+
+# Bearer認証関数の定義
+def get_current_user(cred: HTTPAuthorizationCredentials = Depends(HTTPBearer())):
+    if not cred:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid authentication credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    try:
+        cred = auth.verify_id_token(cred.credentials)
+    except ValueError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid authentication credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    return cred
+
+
+# getを定義
+@app.get("/hello")
+def read_root(cred=Depends(get_current_user)):
+    uid = cred.get("uid")
+    return {"message": f"Hello, {uid}!"}
+
+
+# postを定義
+@app.post("/hello")
+def create_message(message: Message, cred=Depends(get_current_user)):
+    uid = cred.get("uid")
+    return {"message": f"Hello, {message.name}! Your uid is [{uid}]"}
 
 
 def index(request: Request):
@@ -115,19 +153,16 @@ def get_suggested_tags(request: Request, tag_substring):
     tmp_tags = ["Java", "JavaScript", "SolidJS", "Three.JS", "Golang"]
 
     return {
-    	"suggested_tags": [tag for tag in tmp_tags if tag_substring in tag],
+        "suggested_tags": [tag for tag in tmp_tags if tag_substring in tag],
     }
 
-def get_user_by_id(request: Request, user_id: int):
+def get_user_by_id(user_id: int, db: Session = Depends(get_db)):
     # データベースセッションを取得
-    db = request.state.db
-
     # ユーザーをデータベースから取得
     user = db.query(models.Users).filter(models.Users.id == user_id).first()
 
     if user is None:
         raise HTTPException(status_code=404, detail="User not found")
-
     return user
 
 
@@ -151,69 +186,71 @@ def get_user_profile(user_id: int, db: Session = Depends(get_db)):
         "comment": user.comment,
         "join_date": str(user.join_date),
         "department": user.department,
-        "interests": [{"name": interest.name} for interest in user.interests],
-        "expertises": [{"name": expertise.name, "years": expertise.expertise_years} for expertise in user.expertises],
-        "experiences": [{"name": experience.name, "years": experience.experience_years} for experience in user.experiences],
+        # "interests": [{"name": interest.name} for interest in user.interests],
+        # "expertises": [{"name": expertise.name, "years": expertise.expertise_years} for expertise in user.expertises],
+        # "experiences": [{"name": experience.name, "years": experience.experience_years} for experience in user.experiences],
     }
     return profile_data
 
 def update_user_profile(
     user_id: int,
-    edited_sns_link: str,
-    edited_comment: str,
-    edited_join_date: str,
-    edited_department: str,
-    edited_interests: list[int],
-    edited_expertises: List[Tuple[int, int]],
-    edited_experiences: List[Tuple[int, int]],
+    edited_sns_link: str = Body(..., description="SNSリンク"),
+    edited_comment: str = Body(..., description="コメント"),
+    edited_join_date: str = Body(..., description="入社日"),
+    edited_department: str = Body(..., description="部署"),
+    edited_interests: List[int] = Body(..., description="興味のIDリスト"),
+    edited_expertises: List[Tuple[int, int]] = Body(..., description="専門性のIDと年数のリスト"),
+    edited_experiences: List[Tuple[int, int]] = Body(..., description="経験のIDと年数のリスト"),
     db: Session = Depends(get_db)
 ):
-    user_profile = crud.get_user_profile(db,user_id)
-    if user_profile is None:
-        raise HTTPException(status_code=404, detail="User not found")
-    user_profile.sns_link = edited_sns_link
-    user_profile.comment = edited_comment
-    user_profile.join_date = edited_join_date
-    user_profile.department = edited_department
+    try:
+        # ユーザープロファイルの取得
+        user_profile = crud.get_user_profile(db, user_id)
+        # if user_profile is None:
+        #     raise HTTPException(status_code=404, detail="User not found")
 
-    # 興味を更新
-    # まず、指定された user_id に関連する現在の user_interests レコードを削除
-    db.query(models.UserInterests).filter(models.UserInterests.user_id == user_id).delete()
+        # プロファイル情報の更新
+        user_profile.sns_link = edited_sns_link
+        user_profile.comment = edited_comment
+        user_profile.join_date = edited_join_date
+        user_profile.department = edited_department
 
-    db.query(models.UserExpertises).filter(models.UserExpertises.user_id == user_id).delete()
+        # 興味、専門性、経験の更新
+        # データベースから関連データを削除し、新しいデータを追加
+        db.query(models.UserInterests).filter(models.UserInterests.user_id == user_id).delete()
+        db.query(models.UserExpertises).filter(models.UserExpertises.user_id == user_id).delete()
+        db.query(models.UserExperiences).filter(models.UserExperiences.user_id == user_id).delete()
 
-    db.query(models.UserExperiences).filter(models.UserExperiences.user_id == user_id).delete()
+        for interest_id in edited_interests:
+            user_interest = models.UserInterests(
+                user_id=user_id,
+                technology_id=interest_id,
+                interest_years=1,  # 適切な値を設定してください
+            )
+            db.add(user_interest)
 
-    # 興味を更新
-    for interest_id in edited_interests:
-        user_interest = models.UserInterests(
-            user_id=user_id,
-            technology_id=interest_id,
-            interest_years=1,  # 適切な値を設定してください
-        )
-        db.add(user_interest)
+        for expertise in edited_expertises:
+            technology_id, expertise_years = expertise
+            user_expertise = models.UserExpertises(
+                user_id=user_id,
+                technology_id=technology_id,
+                expertise_years=expertise_years,
+            )
+            db.add(user_expertise)
 
-    # 専門性を更新
-    for expertise in edited_expertises:
-        technology_id, expertise_years = expertise
-        user_expertise = models.UserExpertises(
-            user_id=user_id,
-            technology_id=technology_id,
-            expertise_years=expertise_years,
-        )
-        db.add(user_expertise)
+        for experience in edited_experiences:
+            technology_id, experience_years = experience
+            user_experience = models.UserExpertises(
+                user_id=user_id,
+                technology_id=technology_id,
+                experience_years=experience_years,
+            )
+            db.add(user_experience)
 
+        db.commit()
+        return {"is_accepted": True}
 
-    # 経験を更新
-    for experience in edited_experiences:
-        technology_id, experience_years = experience
-        user_experience = models.UserExpertises(
-            user_id=user_id,
-            technology_id=technology_id,
-            experience_years=experience_years,
-        )
-        db.add(user_experience)
-
-    db.commit()
-
-    return{"is_accepted":True}
+    except Exception as e:
+        # エラーハンドリング
+        db.rollback()  # ロールバックしてトランザクションを取り消す
+        raise HTTPException(status_code=500, detail="Internal Server Error")

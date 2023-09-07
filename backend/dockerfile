@@ -11,10 +11,10 @@ COPY ./requirements.txt requirements.txt
 RUN python3 -m pip install --upgrade pip
 
 RUN apk add --no-cache postgresql-libs \
-  # libffi-devを追加
-  && apk add --no-cache --virtual .build-deps gcc musl-dev postgresql-dev libffi-dev \
-  && python3 -m pip install -r /app/requirements.txt --no-cache-dir \
-  && apk --purge del .build-deps
+    && apk add --no-cache --virtual .build-deps gcc g++ musl-dev postgresql-dev libffi-dev \
+    && python3 -m pip install -r /app/requirements.txt --no-cache-dir \
+    && apk --purge del .build-deps
+
 
 COPY . /app
 
