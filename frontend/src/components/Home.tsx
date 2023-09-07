@@ -30,7 +30,7 @@ interface SearchTecResponse {
 }
 
 export interface GetTecsResponse {
-  tecs: {id: number, name: string}[],
+  tecs: { id: number; name: string }[];
 }
 
 function Home() {
@@ -91,8 +91,12 @@ function Home() {
   ];
   const [is_searched, setIsSearched] = useState(false);
   const [tec, setTec] = useState("");
-  const [trend_tecs, setTrendTecs] = useState([] as {id: number, name: string}[]);
-  const [suggested_tecs, setSuggestedTecs] = useState([] as {id: number, name: string}[]);
+  const [trend_tecs, setTrendTecs] = useState(
+    [] as { id: number; name: string }[]
+  );
+  const [suggested_tecs, setSuggestedTecs] = useState(
+    [] as { id: number; name: string }[]
+  );
 
   const [interests, setInterests] = useState(
     [] as { user_id: string; name: string; icon_url: string }[]
@@ -122,7 +126,7 @@ function Home() {
     },
   ];
 
-  const search_tec = (tec: {id: number, name: string}) => {
+  const search_tec = (tec: { id: number; name: string }) => {
     axios
       .get("http://localhost:8000/search-tec/" + tec.id)
       .then((res) => {
@@ -152,7 +156,6 @@ function Home() {
       });
   };
 
-
   useEffect(() => {
     axios
       .get("http://localhost:8000/get-trend-tecs/")
@@ -165,7 +168,6 @@ function Home() {
         console.log(err);
       });
   }, []);
-
 
   if (!user) {
     navigate("/login");
@@ -188,7 +190,7 @@ function Home() {
                   value={tec}
                   onChange={(e) => {
                     setTec(e.target.value);
-                    if(e.target.value === "") setSuggestedTecs(trend_tecs);
+                    if (e.target.value === "") setSuggestedTecs(trend_tecs);
                     else get_suggested_tecs(e.target.value);
                   }}
                 />
@@ -357,8 +359,27 @@ function Home() {
               </div>
               <h4 className="mt-4 text-secondary">トレンド技術</h4>
               <div className="m-2">
+                {/* <button
+                  className="btn btn-link p-0 mx-2"
+                  onClick={() => {
+                    search_tec(tec);
+                  }}
+                >
+                  {tec.name}
+                </button> */}
+
                 {trend_tecs.map((tec) => {
-                  return <h5 className="fw-bold">#{tec.name}</h5>;
+                  return (
+                    <button
+                      className="btn btn-link"
+                      onClick={() => {
+                        search_tec(tec);
+                        setIsSearching(true);
+                      }}
+                    >
+                      #{tec.name}
+                    </button>
+                  );
                 })}
               </div>
             </div>
