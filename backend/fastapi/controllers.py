@@ -13,7 +13,7 @@ from schemas import schemas
 
 '''from core import config
 from crud import crud'''
-from fastapi import Depends, FastAPI, HTTPException
+
 
 # from migration import database, models
 
