@@ -1,8 +1,10 @@
 from datetime import datetime
 
 from core.config import get_env
-from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, create_engine
+from sqlalchemy import (Column, DateTime, ForeignKey, Integer, String,
+                        create_engine)
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import relationship  # 必要な場合はインポート
 
 # Engine の作成
 Engine = create_engine(get_env().database_url, encoding="utf-8", echo=False)
@@ -74,9 +76,10 @@ class UserExperiences(BaseModel):
 
     __tablename__ = "user_experiences"
     id = Column("id", Integer, primary_key=True, autoincrement=True)
-    user_id = Column("user_id", String, ForeignKey("users.id"))
+    user_id = Column("user_id", String, ForeignKey("user_detail.user_id"))
     technology_id = Column("technology_id", Integer, ForeignKey("technologies.id"))
     experience_years = Column("experience_years", Integer)
+    user = relationship("UserDetail", backref="experiences",primaryjoin="UserDetail.user_id == UserExperiences.user_id")  # 追加
 
 
 class UserExpertises(BaseModel):
@@ -90,9 +93,10 @@ class UserExpertises(BaseModel):
 
     __tablename__ = "user_expertises"
     id = Column("id", Integer, primary_key=True, autoincrement=True)
-    user_id = Column("user_id", String, ForeignKey("users.id"))
+    user_id = Column("user_id", String, ForeignKey("user_detail.user_id"))
     technology_id = Column("technology_id", ForeignKey("technologies.id"))
     expertise_years = Column("expertise_years", Integer)
+    user = relationship("UserDetail", backref="expertises",primaryjoin="UserDetail.user_id == UserExpertises.user_id")  # 追加
 
 
 class UserInterests(BaseModel):
@@ -106,9 +110,10 @@ class UserInterests(BaseModel):
 
     __tablename__ = "user_interests"
     id = Column("id", Integer, primary_key=True, autoincrement=True)
-    user_id = Column("user_id", String, ForeignKey("users.id"))
+    user_id = Column("user_id", String, ForeignKey("user_detail.user_id"))
     technology_id = Column("technology_id", ForeignKey("technologies.id"))
     interest_years = Column("interest_years", Integer)
+    user = relationship("UserDetail", backref="interests",primaryjoin="UserDetail.user_id == UserInterests.user_id")
 
 
 class StudySessions(BaseModel):

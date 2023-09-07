@@ -1,16 +1,18 @@
 from typing import List, Tuple
 
 import firebase_admin
+from firebase_admin import auth, credentials
+from pydantic import BaseModel
 from core.database import get_db  # ここでget_db関数をインポート
 from crud import crud
 from fastapi import APIRouter, Body, Depends, FastAPI, HTTPException, status
+from fastapi.responses import JSONResponse
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-from firebase_admin import auth, credentials
 from migration import models
-from pydantic import BaseModel
 from schemas import schemas
+from sqlalchemy import desc, func
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from starlette.middleware.cors import CORSMiddleware
 from starlette.requests import Request
 
@@ -149,15 +151,9 @@ def get_tec_result(request: Request, tec_id: int):
     }
 
 
-def get_trend_tecs(request: Request):
-    tmp_tecs = ["TypeScript", "SolidJS", "Three.JS"]
-    return {
-        "tecs": [{"id": 1, "name": tec_name} for tec_name in tmp_tecs],
-    }
-
-
 def get_suggested_tecs(request: Request, tec_substring):
     tmp_tecs = ["Java", "JavaScript", "SolidJS", "Three.JS", "Golang"]
+
     return {
         "tecs": [
             {"id": 1, "name": tec_name}
@@ -194,10 +190,25 @@ def get_all_users(db: Session = Depends(get_db)):
     return users
 
 
-def get_user_profile(user_id: int, db: Session = Depends(get_db)):
+def get_user_profile(user_id: str, db: Session = Depends(get_db)):
     user = crud.get_user_profile(db, user_id)
     if user is None:
         raise HTTPException(status_code=404, detail="User not found")
+
+    interests = []
+    for interest in db.query(models.UserInterests).filter(models.UserInterests.user_id == user_id).all():
+        technology = crud.get_technology(db, interest.technology_id)
+        interests.append({"id": technology.id, "name": technology.name})
+
+    expertises = []
+    for expertise in db.query(models.UserExpertises).filter(models.UserExpertises.user_id == user_id).all():
+        technology = crud.get_technology(db, expertise.technology_id)
+        expertises.append({"id": technology.id, "name": technology.name, "years": expertise.expertise_years})
+
+    experiences = []
+    for experience in db.query(models.UserExperiences).filter(models.UserExperiences.user_id == user_id).all():
+        technology = crud.get_technology(db, experience.technology_id)
+        experiences.append({"id": technology.id, "name": technology.name, "years": experience.experience_years})
 
     # プロフィール情報を要求されたフォーマットに整形
     profile_data = {
@@ -206,15 +217,15 @@ def get_user_profile(user_id: int, db: Session = Depends(get_db)):
         "comment": user.comment,
         "join_date": str(user.join_date),
         "department": user.department,
-        # "interests": [{"name": interest.name} for interest in user.interests],
-        # "expertises": [{"name": expertise.name, "years": expertise.expertise_years} for expertise in user.expertises],
-        # "experiences": [{"name": experience.name, "years": experience.experience_years} for experience in user.experiences],
+        "interests": interests,
+        "expertises": expertises,
+        "experiences": experiences,
     }
     return profile_data
 
 
 def update_user_profile(
-    user_id: int,
+    user_id: str,
     edited_sns_link: str = Body(..., description="SNSリンク"),
     edited_comment: str = Body(..., description="コメント"),
     edited_join_date: str = Body(..., description="入社日"),
@@ -284,7 +295,74 @@ def update_user_profile(
         raise HTTPException(status_code=500, detail="データベースエラー: {}".format(str(e)))
 
 
-# except Exception as e:
-#     # エラーハンドリング
-#     db.rollback()  # ロールバックしてトランザクションを取り消す
-#     raise HTTPException(status_code=500, detail="Internal Server Error")
+def update_like(
+    user_id: int,
+    study_session_id: int,
+    db: Session = Depends(get_db)
+):
+    # Likes モデルの新しいインスタンスを作成し、必要な値を設定します
+    new_like = models.Likes(user_id=user_id, study_session_id=study_session_id)
+
+    # データベースに新しいレコードを追加
+    db.add(new_like)
+    db.commit()
+
+    # レスポンスなどの適切な処理を行います
+    return {"message": "Liked successfully"}
+
+
+def update_not_like(
+    user_id: int,
+    study_session_id: int,
+    db: Session = Depends(get_db)
+):
+    # Likes テーブルから削除対象のレコードをクエリ
+    like_to_delete = db.query(models.Likes).filter_by(user_id=user_id, study_session_id=study_session_id).first()
+
+    if like_to_delete:
+        # レコードが見つかった場合、削除
+        db.delete(like_to_delete)
+        db.commit()
+        return {"message": "Not liked successfully"}
+    else:
+        # レコードが見つからなかった場合、エラーレスポンスなど適切な処理を行う
+        return {"message": "Like not found"}
+
+
+def timeline(db: Session = Depends(get_db)):
+    # StudySessionsテーブルの全てのレコードを取得
+    sessions = db.query(models.StudySessions).all()
+    return sessions
+
+def get_trend(db: Session = Depends(get_db)):
+    # technology_idごとにカウントを取得し、降順でソート
+    trend_result = (
+        db.query(models.UserInterests.technology_id, func.count(models.UserInterests.technology_id).label('count'))
+        .group_by(models.UserInterests.technology_id)
+        .order_by(desc('count'))
+        .limit(3)
+        .all()
+    )
+    # クエリ結果からtechnology_idだけのリストを取得
+    top_technologies = {"tecs": [{"id": result.technology_id, "name": crud.get_technology(db, result.technology_id).name} for result in trend_result]}
+
+    return top_technologies
+
+
+def get_tech_users(tec_id: int, db: Session = Depends(get_db)):
+    # 1. 指定された tec_id で各テーブルから情報を取得
+    interests = db.query(models.UserInterests).options(joinedload(models.UserInterests.user)).filter_by(technology_id=tec_id).all()
+    expertises = db.query(models.UserExpertises).options(joinedload(models.UserExpertises.user)).filter_by(technology_id=tec_id).all()
+    experiences = db.query(models.UserExperiences).options(joinedload(models.UserExperiences.user)).filter_by(technology_id=tec_id).all()
+
+    # 2. user_detail から情報を取得
+    interest_data = [{"user_id": item.user_id, "name": item.user.name, "icon_image": item.user.icon_image, "interest_years": item.interest_years} for item in interests]
+    expertise_data = [{"user_id": item.user_id, "name": item.user.name, "icon_image": item.user.icon_image, "expertise_years": item.expertise_years} for item in expertises]
+    experience_data = [{"user_id": item.user_id, "name": item.user.name, "icon_image": item.user.icon_image, "experience_years": item.experience_years} for item in experiences]
+
+    # 3. 結果を整形して返す
+    return {
+        "interests": interest_data,
+        "expertises": expertise_data,
+        "experiences": experience_data
+    }
