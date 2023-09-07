@@ -143,10 +143,8 @@ class LikesBase(BaseModel):
     user_id: int
     study_session_id: int
 
-
 class LikesCreate(LikesBase):
     pass
-
 
 class LikesRead(LikesBase):
     id: int

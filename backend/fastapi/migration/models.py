@@ -51,7 +51,7 @@ class UserActive(BaseModel):
 
     __tablename__ = "user_active"
 
-    user_id = Column("user_id", ForeignKey("users.id"), primary_key=True)
+    user_id = Column("user_id",  Integer, ForeignKey("users.id"), primary_key=True)
     created_at = Column(
         "created_at",
         DateTime,
@@ -70,7 +70,7 @@ class UserLeave(BaseModel):
 
     __tablename__ = "user_leave"
 
-    user_id = Column("user_id", ForeignKey("users.id"), primary_key=True)
+    user_id = Column("user_id",  Integer, ForeignKey("users.id"), primary_key=True)
     created_at = Column(
         "created_at",
         DateTime,
@@ -95,7 +95,7 @@ class UserDetail(BaseModel):
 
     __tablename__ = "user_detail"
 
-    user_id = Column("user_id", ForeignKey("users.id"), primary_key=True)
+    user_id = Column("user_id",  Integer, ForeignKey("users.id"), primary_key=True)
     name = Column("name", String(256))
     sns_link = Column("sns_link", String(256))
     comment = Column("comment", String(256))
@@ -127,7 +127,7 @@ class UserExperiences(BaseModel):
 
     __tablename__ = "user_experiences"
     id = Column("id", Integer, primary_key=True, autoincrement=True)
-    user_id = Column("user_id", ForeignKey("users.id"))
+    user_id = Column("user_id", Integer,  ForeignKey("users.id"))
     technology_id = Column("technology_id", ForeignKey("technologies.id"))
     experience_years = Column("experience_years", Integer)
 
@@ -144,7 +144,7 @@ class UserExpertises(BaseModel):
 
     __tablename__ = "user_expertises"
     id = Column("id", Integer, primary_key=True, autoincrement=True)
-    user_id = Column("user_id", ForeignKey("users.id"))
+    user_id = Column("user_id",  Integer, ForeignKey("users.id"))
     technology_id = Column("technology_id", ForeignKey("technologies.id"))
     expertise_years = Column("expertise_years", Integer)
 
@@ -161,7 +161,7 @@ class UserInterests(BaseModel):
 
     __tablename__ = "user_interests"
     id = Column("id", Integer, primary_key=True, autoincrement=True)
-    user_id = Column("user_id", ForeignKey("users.id"))
+    user_id = Column("user_id",  Integer, ForeignKey("users.id"))
     technology_id = Column("technology_id", ForeignKey("technologies.id"))
     interest_years = Column("interest_years", Integer)
 
@@ -200,5 +200,5 @@ class Likes(BaseModel):
 
     __tablename__ = "likes"
     id = Column("id", Integer, primary_key=True, autoincrement=True)
-    user_id = Column("user_id", ForeignKey("users.id"))
+    user_id = Column("user_id", Integer,  ForeignKey("users.id"))
     study_session_id = Column("study_session_id", ForeignKey("study_sessions.id"))

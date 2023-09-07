@@ -165,3 +165,45 @@ def create_like(db: Session, like: schemas.LikesCreate):
     db.commit()
     db.refresh(db_like)
     return db_like
+
+
+def get_user_profile(db: Session, user_id: int):
+    return db.query(models.UserDetail).filter(models.UserDetail.user_id == user_id).first()
+
+# ユーザの興味を更新する関数
+def update_user_interest(db: Session, user_id: int, technology_id: int):
+    # ユーザの興味をすべて取得
+    user_interests = (
+        db.query(models.UserInterests)
+        .filter(models.UserInterests.user_id == user_id)
+        .all()
+    )
+
+    # ユーザの興味をすべて更新
+    for user_interest in user_interests:
+        user_interest.technology_id = technology_id  # 技術を更新（適切な処理に置き換えてください）
+        user_interest.interest_years += 1  # 興味年数を更新（適切な処理に置き換えてください）
+
+# ユーザの専門性を更新する関数
+def update_user_expertise(db: Session, user_id: int, technology_id: int, years: int):
+
+    if technology_id:
+        # ユーザの専門性を更新
+        user_expertise = models.UserExpertises(
+            user_id=user_id,
+            technology_id=technology_id,
+            expertise_years=years,
+        )
+        db.add(user_expertise)
+
+# ユーザの経験を更新する関数
+def update_user_experience(db: Session, user_id: int, technology_id: int, years: int):
+
+    if technology_id:
+        # ユーザの経験を更新
+        user_experience = models.UserExperiences(
+            user_id=user_id,
+            technology_id=technology_id,
+            experience_years=years,
+        )
+        db.add(user_experience)
