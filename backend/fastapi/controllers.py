@@ -11,6 +11,7 @@ from starlette.requests import Request
 from core.database import get_db  # ここでget_db関数をインポート
 from crud import crud
 from fastapi import APIRouter, Body, Depends, FastAPI, HTTPException, status
+from fastapi.responses import JSONResponse
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from migration import models
 from schemas import schemas
@@ -272,7 +273,47 @@ def update_user_profile(
             db.rollback()
             raise HTTPException(status_code=500, detail="データベースエラー: {}".format(str(e)))
 
-    # except Exception as e:
-    #     # エラーハンドリング
-    #     db.rollback()  # ロールバックしてトランザクションを取り消す
-    #     raise HTTPException(status_code=500, detail="Internal Server Error")
+
+def update_like(
+    user_id: int,
+    study_session_id: int,
+    db: Session = Depends(get_db)
+):
+    # Likes モデルの新しいインスタンスを作成し、必要な値を設定します
+    new_like = models.Likes(user_id=user_id, study_session_id=study_session_id)
+
+    # データベースに新しいレコードを追加
+    db.add(new_like)
+    db.commit()
+
+    # レスポンスなどの適切な処理を行います
+    return {"message": "Liked successfully"}
+
+
+def update_not_like(
+    user_id: int,
+    study_session_id: int,
+    db: Session = Depends(get_db)
+):
+    # Likes テーブルから削除対象のレコードをクエリ
+    like_to_delete = db.query(models.Likes).filter_by(user_id=user_id, study_session_id=study_session_id).first()
+
+    if like_to_delete:
+        # レコードが見つかった場合、削除
+        db.delete(like_to_delete)
+        db.commit()
+        return {"message": "Not liked successfully"}
+    else:
+        # レコードが見つからなかった場合、エラーレスポンスなど適切な処理を行う
+        return {"message": "Like not found"}
+
+
+def timeline(db: Session = Depends(get_db)):
+    # Likes テーブルのデータをクエリ
+    likes = db.query(models.Likes).all()
+
+    # レコードを JSON 形式に変換
+    likes_json = [{"user_id": like.user_id, "study_session_id": like.study_session_id} for like in likes]
+
+    # JSON 形式のデータをレスポンスとして返す
+    return JSONResponse(content=likes_json)
