@@ -2,12 +2,14 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { auth, provider } from "../firebase";
 import { signInWithPopup, getAuth, getIdToken } from "firebase/auth";
+import { useAuthContext } from "../context/AuthContext";
 
 const FASTAPI_ENDPOINT = "http://localhost:8000";
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
   const [error, setError] = useState<string>("");
+  const { user } = useAuthContext();
 
   const handleLogin = async (event: React.MouseEvent<HTMLButtonElement>) => {
     try {
@@ -31,11 +33,13 @@ const Login: React.FC = () => {
   };
 
   const sendRequestToBackend = async (token: string) => {
-    const response = await fetch(FASTAPI_ENDPOINT, {
-      method: "GET",
+    const apiUrl = `${FASTAPI_ENDPOINT}/users/`;
+    const response = await fetch(apiUrl, {
+      method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,
       },
+      body: JSON.stringify({ user_id: user?.uid }),
     });
     const data = await response.json();
     console.log(data);
