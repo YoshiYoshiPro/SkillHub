@@ -17,6 +17,9 @@ function Header() {
           <h1 className="my-0">SkillHub</h1>
         </Link>
         <div className="ml-auto my-auto">
+          <button type="button" className="mr-4 btn btn-primary">
+            Googleログアウト
+          </button>
           <Link to={"/profile/" + user?.uid}>
             <img
               className="border border-dark rounded-circle"
