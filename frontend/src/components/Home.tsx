@@ -359,15 +359,6 @@ function Home() {
               </div>
               <h4 className="mt-4 text-secondary">トレンド技術</h4>
               <div className="m-2">
-                {/* <button
-                  className="btn btn-link p-0 mx-2"
-                  onClick={() => {
-                    search_tec(tec);
-                  }}
-                >
-                  {tec.name}
-                </button> */}
-
                 {trend_tecs.map((tec) => {
                   return (
                     <button
