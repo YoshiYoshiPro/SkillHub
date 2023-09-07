@@ -88,13 +88,13 @@ def get_data(request: Request):
     return {"key": "value", "message": "Hello from FastAPI!"}
 
 
-def get_tag_result(request: Request, tag):
+def get_tec_result(request: Request, tec_id: int):
     return {
         "is_accepted": True,
         "interests": [
             {
-                "user_id": tag,
-                "name": tag,
+                "user_id": tec_id,
+                "name": tec_id,
                 "icon_url": "http://localhost:3000/logo192.png",
             },
             {
@@ -157,11 +157,11 @@ def get_tag_result(request: Request, tag):
     }
 
 
-def get_suggested_tags(request: Request, tag_substring):
-    tmp_tags = ["Java", "JavaScript", "SolidJS", "Three.JS", "Golang"]
+def get_suggested_tecs(request: Request, tec_substring):
+    tmp_tecs = ["Java", "JavaScript", "SolidJS", "Three.JS", "Golang"]
 
     return {
-        "suggested_tags": [tag for tag in tmp_tags if tag_substring in tag],
+        "suggested_tecs": [{"id": 1, "name": tec_name} for tec_name in tmp_tecs if tec_substring in tec_name],
     }
 
 
@@ -173,9 +173,9 @@ def get_profile(request: Request, user_id: str):
 	    "comment": "これはテストだよ",
 	    "join_date": "2020-05-12",
 	    "department": "SkillHub開発部",
-	    "interests": [{"name": "MySQL"}, {"name": "SQLite"}, {"name": "Three.JS"}],
-	    "expertises": [{"name": "postgreSQL", "years": 3}, {"name": "React", "years": 3}, {"name": "TypeScript", "years": 3}, {"name": "fastAPI", "years": 4}],
-	    "experiences": [{"name": "postgreSQL", "years": 3}, {"name": "React", "years": 3}],
+	    "interests": [{"id": 1, "name": "MySQL"}, {"id": 1, "name": "SQLite"}, {"id": 1, "name": "Three.JS"}],
+	    "expertises": [{"id": 1, "name": "postgreSQL", "years": 3}, {"id": 1, "name": "React", "years": 3}, {"id": 1, "name": "TypeScript", "years": 3}, {"id": 1, "name": "fastAPI", "years": 4}],
+	    "experiences": [{"id": 1, "name": "postgreSQL", "years": 3}, {"id": 1, "name": "React", "years": 3}],
     }
 
 

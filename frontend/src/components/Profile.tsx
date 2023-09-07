@@ -4,7 +4,7 @@ import { useParams } from "react-router-dom";
 import { useAuthContext } from "../context/AuthContext";
 import log1 from "../img/log1.png";
 
-import { GetSuggestedTagsResponse } from "./Home";
+import { GetSuggestedTecsResponse } from "./Home";
 
 interface GetProfileResponse {
 	name: string,
@@ -13,21 +13,21 @@ interface GetProfileResponse {
 	comment: string,
 	join_date: string,
 	department: string
-	interests: {name: string}[],
-	expertises: {name: string, years: number}[],
-	experiences: {name: string, years: number}[],
+	interests: {id: number, name: string}[],
+	expertises: {id: number, name: string, years: number}[],
+	experiences: {id: number, name: string, years: number}[],
 }
 
 function Profile() {
   const { user_id } = useParams();
 
   const [is_editing, setIsEditing] = useState(false);
-  const [interest_tag_substring, setInterestTagSubstring] = useState("");
-  const [expertise_tag_substring, setExpertiseTagSubstring] = useState("");
-  const [experience_tag_substring, setExperienceTagSubstring] = useState("");
-  const [suggested_interest_tags, setSuggestedInterestTags] = useState([] as string[]);
-  const [suggested_expertise_tags, setSuggestedExpertiseTags] = useState([] as string[]);
-  const [suggested_experience_tags, setSuggestedExperienceTags] = useState([] as string[]);
+  const [interest_tec_substring, setInterestTecSubstring] = useState("");
+  const [expertise_tec_substring, setExpertiseTecSubstring] = useState("");
+  const [experience_tec_substring, setExperienceTecSubstring] = useState("");
+  const [suggested_interest_tecs, setSuggestedInterestTecs] = useState([] as {id: number, name: string}[]);
+  const [suggested_expertise_tecs, setSuggestedExpertiseTecs] = useState([] as {id: number, name: string}[]);
+  const [suggested_experience_tecs, setSuggestedExperienceTecs] = useState([] as {id: number, name: string}[]);
 
   const [name, setName] = useState("");
   const [icon_url, setIconUrl] = useState("");
@@ -40,18 +40,18 @@ function Profile() {
   const [comment, setComment] = useState("");
   const [join_date, setJoinDate] = useState("1900-12-17");
   const [department, setDepartment] = useState("");
-  const [interests, setInterests] = useState([] as {name: string}[]);
-  const [expertises, setExpertises] = useState([] as {name: string, years: number}[]);
-  const [experiences, setExperiences] = useState([] as {name: string, years: number}[]);
+  const [interests, setInterests] = useState([] as {id: number, name: string}[]);
+  const [expertises, setExpertises] = useState([] as {id: number, name: string, years: number}[]);
+  const [experiences, setExperiences] = useState([] as {id: number, name: string, years: number}[]);
 
   const [edited_name, setEditedName] = useState("");
   const [edited_Mail, setEditedMail] = useState("");
   const [edited_comment, setEditedComment] = useState("");
   const [edited_join_date, setEditedJoinDate] = useState("1900-12-17");
   const [edited_department, setEditedDepartment] = useState("");
-  const [edited_interests, setEditedInterests] = useState([] as {name: string}[]);
-  const [edited_expertises, setEditedExpertises] = useState([] as {name: string, years: number}[]);
-  const [edited_experiences, setEditedExperiences] = useState([] as {name: string, years: number}[]);
+  const [edited_interests, setEditedInterests] = useState([] as {id: number, name: string}[]);
+  const [edited_expertises, setEditedExpertises] = useState([] as {id: number, name: string, years: number}[]);
+  const [edited_experiences, setEditedExperiences] = useState([] as {id: number, name: string, years: number}[]);
 
   const edit_start = () => {
     setEditedName(name);
@@ -72,12 +72,12 @@ function Profile() {
   }, []);
 
   // 興味のある技術専用タグサジェストを変更する処理
-  const interestTagSubstringChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setInterestTagSubstring(e.target.value.trim());
-    axios.get('http://localhost:8000/get-suggested-tags/' + e.target.value.trim())
+  const interestTecSubstringChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setInterestTecSubstring(e.target.value.trim());
+    axios.get('http://localhost:8000/get-suggested-tecs/' + e.target.value.trim())
     .then((res) => {
-      const get_suggested_tags_res: GetSuggestedTagsResponse = res.data;
-      setSuggestedInterestTags(get_suggested_tags_res.suggested_tags);
+      const get_suggested_tecs_res: GetSuggestedTecsResponse = res.data;
+      setSuggestedInterestTecs(get_suggested_tecs_res.suggested_tecs);
     })
     .catch((err) => {
       console.log(err);
@@ -85,12 +85,12 @@ function Profile() {
   }, []);
 
   // 得意な技術専用タグサジェストを変更する処理
-  const expertiseTagSubstringChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setExpertiseTagSubstring(e.target.value.trim());
-    axios.get('http://localhost:8000/get-suggested-tags/' + e.target.value.trim())
+  const expertiseTecSubstringChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setExpertiseTecSubstring(e.target.value.trim());
+    axios.get('http://localhost:8000/get-suggested-tecs/' + e.target.value.trim())
     .then((res) => {
-      const get_suggested_tags_res: GetSuggestedTagsResponse = res.data;
-      setSuggestedExpertiseTags(get_suggested_tags_res.suggested_tags);
+      const get_suggested_tecs_res: GetSuggestedTecsResponse = res.data;
+      setSuggestedExpertiseTecs(get_suggested_tecs_res.suggested_tecs);
     })
     .catch((err) => {
       console.log(err);
@@ -98,12 +98,12 @@ function Profile() {
   }, []);
 
   // 業務経験のある技術専用タグサジェストを変更する処理
-  const experienceTagSubstringChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setExperienceTagSubstring(e.target.value.trim());
-    axios.get('http://localhost:8000/get-suggested-tags/' + e.target.value.trim())
+  const experienceTecSubstringChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setExperienceTecSubstring(e.target.value.trim());
+    axios.get('http://localhost:8000/get-suggested-tecs/' + e.target.value.trim())
     .then((res) => {
-      const get_suggested_tags_res: GetSuggestedTagsResponse = res.data;
-      setSuggestedExperienceTags(get_suggested_tags_res.suggested_tags);
+      const get_suggested_tecs_res: GetSuggestedTecsResponse = res.data;
+      setSuggestedExperienceTecs(get_suggested_tecs_res.suggested_tecs);
     })
     .catch((err) => {
       console.log(err);
@@ -128,20 +128,20 @@ function Profile() {
   }, []);
 
   // 編集中に新たにタグを追加する処理
-  const editedInterestsAdd = useCallback((suggested_tag: string) => {
-    setInterestTagSubstring("");
-    setSuggestedInterestTags([]);
-    setEditedInterests(edited_interests => new Array(...edited_interests, {name: suggested_tag}));
+  const editedInterestsAdd = useCallback((suggested_tec: {id: number, name: string}) => {
+    setInterestTecSubstring("");
+    setSuggestedInterestTecs([]);
+    setEditedInterests(edited_interests => new Array(...edited_interests, suggested_tec));
   }, []);
-  const editedExpertisesAdd = useCallback((suggested_tag: string) => {
-    setExpertiseTagSubstring("");
-    setSuggestedExpertiseTags([]);
-    setEditedExpertises(edited_expertises => new Array(...edited_expertises, {name: suggested_tag, years: 1}));
+  const editedExpertisesAdd = useCallback((suggested_tec: {id: number, name: string}) => {
+    setExpertiseTecSubstring("");
+    setSuggestedExpertiseTecs([]);
+    setEditedExpertises(edited_expertises => new Array(...edited_expertises, {...suggested_tec, years: 1}));
   }, []);
-  const editedExperiencesAdd = useCallback((suggested_tag: string) => {
-    setExperienceTagSubstring("");
-    setSuggestedExperienceTags([]);
-    setEditedExperiences(edited_experiences => new Array(...edited_experiences, {name: suggested_tag, years: 1}));
+  const editedExperiencesAdd = useCallback((suggested_tec: {id: number, name: string}) => {
+    setExperienceTecSubstring("");
+    setSuggestedExperienceTecs([]);
+    setEditedExperiences(edited_experiences => new Array(...edited_experiences, {...suggested_tec, years: 1}));
   }, []);
 
   // 編集中にタグを削除する処理
@@ -274,15 +274,15 @@ function Profile() {
                       </div>
                     })
                   }
-                  <input type="text" className="w-50 form-control" value={interest_tag_substring} onChange={interestTagSubstringChange}/>
+                  <input type="text" className="w-50 form-control" value={interest_tec_substring} onChange={interestTecSubstringChange}/>
                   {
-                    suggested_interest_tags.map(suggested_tag => {
+                    suggested_interest_tecs.map(suggested_tec => {
                       return (
                         <button
                           className="btn btn-link p-0 mx-2"
-                          onClick={() => {editedInterestsAdd(suggested_tag)}}
+                          onClick={() => {editedInterestsAdd(suggested_tec)}}
                         >
-                          {suggested_tag}
+                          {suggested_tec.name}
                         </button>
                       )
                     })
@@ -315,15 +315,15 @@ function Profile() {
                       </div>
                     })
                   }
-                  <input type="text" className="w-50 form-control" value={experience_tag_substring} onChange={experienceTagSubstringChange}/>
+                  <input type="text" className="w-50 form-control" value={experience_tec_substring} onChange={experienceTecSubstringChange}/>
                   {
-                    suggested_experience_tags.map(suggested_tag => {
+                    suggested_experience_tecs.map(suggested_tec => {
                       return (
                         <button
                           className="btn btn-link p-0 mx-2"
-                          onClick={() => {editedExperiencesAdd(suggested_tag)}}
+                          onClick={() => {editedExperiencesAdd(suggested_tec)}}
                         >
-                          {suggested_tag}
+                          {suggested_tec.name}
                         </button>
                       )
                     })
@@ -356,15 +356,15 @@ function Profile() {
                       </div>
                     })
                   }
-                  <input type="text" className="w-50 form-control" value={expertise_tag_substring} onChange={expertiseTagSubstringChange}/>
+                  <input type="text" className="w-50 form-control" value={expertise_tec_substring} onChange={expertiseTecSubstringChange}/>
                   {
-                    suggested_expertise_tags.map(suggested_tag => {
+                    suggested_expertise_tecs.map(suggested_tec => {
                       return (
                         <button
                           className="btn btn-link p-0 mx-2"
-                          onClick={() => {editedExpertisesAdd(suggested_tag)}}
+                          onClick={() => {editedExpertisesAdd(suggested_tec)}}
                         >
-                          {suggested_tag}
+                          {suggested_tec.name}
                         </button>
                       )
                     })
