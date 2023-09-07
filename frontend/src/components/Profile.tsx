@@ -1,6 +1,7 @@
 import { useCallback, useState, useEffect } from "react";
 import axios from 'axios';
 import { useParams } from "react-router-dom";
+import { useAuthContext } from "../context/AuthContext";
 import log1 from "../img/log1.png";
 
 import { GetSuggestedTagsResponse } from "./Home";
@@ -30,6 +31,11 @@ function Profile() {
 
   const [name, setName] = useState("");
   const [icon_url, setIconUrl] = useState("");
+
+  // ユーザー情報を取得
+  const { user } = useAuthContext();
+
+  const [textName, setNameText] = useState("");
   const [textMail, setMailText] = useState("");
   const [comment, setComment] = useState("");
   const [join_date, setJoinDate] = useState("1900-12-17");
@@ -65,6 +71,7 @@ function Profile() {
     setIsEditing(false);
   }, []);
 
+  // 興味のある技術専用タグサジェストを変更する処理
   const interestTagSubstringChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setInterestTagSubstring(e.target.value.trim());
     axios.get('http://localhost:8000/get-suggested-tags/' + e.target.value.trim())
@@ -77,6 +84,7 @@ function Profile() {
     });
   }, []);
 
+  // 得意な技術専用タグサジェストを変更する処理
   const expertiseTagSubstringChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setExpertiseTagSubstring(e.target.value.trim());
     axios.get('http://localhost:8000/get-suggested-tags/' + e.target.value.trim())
@@ -89,6 +97,7 @@ function Profile() {
     });
   }, []);
 
+  // 業務経験のある技術専用タグサジェストを変更する処理
   const experienceTagSubstringChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setExperienceTagSubstring(e.target.value.trim());
     axios.get('http://localhost:8000/get-suggested-tags/' + e.target.value.trim())
@@ -117,6 +126,8 @@ function Profile() {
   const editedDepartmentChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setEditedDepartment(e.target.value.trim());
   }, []);
+
+  // 編集中に新たにタグを追加する処理
   const editedInterestsAdd = useCallback((suggested_tag: string) => {
     setInterestTagSubstring("");
     setSuggestedInterestTags([]);
@@ -132,6 +143,8 @@ function Profile() {
     setSuggestedExperienceTags([]);
     setEditedExperiences(edited_experiences => new Array(...edited_experiences, {name: suggested_tag, years: 1}));
   }, []);
+
+  // 編集中にタグを削除する処理
   const editedInterestsErase = useCallback((target_index: number) => {
     setEditedInterests(edited_interests => edited_interests.filter((_, index) => (target_index !== index)));
   }, []);
@@ -141,6 +154,8 @@ function Profile() {
   const editedExperiencesErase = useCallback((target_index: number) => {
     setEditedExperiences(edited_experiences => edited_experiences.filter((_, index) => (target_index !== index)));
   }, []);
+
+  // 編集中にタグに対する年数を変更する処理
   const editedExpertisesYearsChange = useCallback((target_index: number, new_years: number) => {
     setEditedExpertises(edited_expertises => edited_expertises.map((expertise, index) => {
       if(target_index === index) return {...expertise, years: new_years};
@@ -155,6 +170,7 @@ function Profile() {
   }, []);
 
   useEffect(() => {
+    // プロフィール情報を取得する
     axios.get('http://localhost:8000/get-profile/' + user_id)
     .then((res) => {
       const get_profile_res: GetProfileResponse = res.data;
@@ -162,6 +178,7 @@ function Profile() {
       setName(get_profile_res.name);
       setIconUrl(get_profile_res.icon_url);
       setComment(get_profile_res.comment);
+      setJoinDate(get_profile_res.join_date);
       setDepartment(get_profile_res.department);
       setInterests(get_profile_res.interests);
       setExpertises(get_profile_res.expertises);
@@ -178,7 +195,7 @@ function Profile() {
         <div className="d-flex">
           <div className="col-4 mt-5">
             <img
-              src={icon_url}
+              src={user?.photoURL || log1}
               className="rounded-circle border border-dark"
               alt="アイコン"
             />
@@ -186,11 +203,21 @@ function Profile() {
           <div className="col-8">
             <div className="mt-5 mb-5 d-flex">
               <p className=" mb-1">名前</p>
-              <p className="text-center w-75 ml-auto">{name}</p>
+
+              {is_editing ? (
+                <p className="text-center w-75 ml-auto">{user?.displayName}</p>
+              ) : (
+                <p className="text-center w-75 ml-auto">{textName}</p>
+              )}
             </div>
             <div className="mb-5 d-flex">
-              <p className=" mb-1">メールアドレス:</p>
-              <p className="text-center w-75 ml-auto">{textMail}</p>
+              <p className=" mb-1">メールアドレス</p>
+
+              {is_editing ? (
+                <p className="text-center w-75 ml-auto">{user?.email}</p>
+              ) : (
+                <p className="text-center w-75 ml-auto">{textMail}</p>
+              )}
             </div>
             <div className="mb-5 d-flex">
               <p className=" mb-1">ひとこと</p>

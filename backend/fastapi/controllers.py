@@ -1,3 +1,13 @@
+import firebase_admin
+
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from firebase_admin import auth, credentials
+from pydantic import BaseModel
+
+"""from core import config
+from crud import crud"""
+
+
 from typing import List
 
 import uvicorn
@@ -7,18 +17,18 @@ from starlette.requests import Request
 
 from core.database import get_db  # ここでget_db関数をインポート
 from crud import crud
-from fastapi import APIRouter, Depends, FastAPI, HTTPException
+from fastapi import APIRouter, Depends, FastAPI, HTTPException, status
 from migration import models
 from schemas import schemas
-
-'''from core import config
-from crud import crud'''
 
 
 # from migration import database, models
 
 app = FastAPI(title="社内勉強会の開催を活発にするwebアプリ", description="社内の勉強会の予定を共有するWebアプリケーション")
 
+# Firebaseの初期化
+cred = credentials.Certificate("./serviceAccountKey.json")
+firebase_admin.initialize_app(cred)
 
 router = APIRouter()
 
@@ -30,6 +40,44 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+# リクエストボディの定義
+class Message(BaseModel):
+    name: str
+
+
+# Bearer認証関数の定義
+def get_current_user(cred: HTTPAuthorizationCredentials = Depends(HTTPBearer())):
+    if not cred:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid authentication credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    try:
+        cred = auth.verify_id_token(cred.credentials)
+    except ValueError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid authentication credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    return cred
+
+
+# getを定義
+@app.get("/hello")
+def read_root(cred=Depends(get_current_user)):
+    uid = cred.get("uid")
+    return {"message": f"Hello, {uid}!"}
+
+
+# postを定義
+@app.post("/hello")
+def create_message(message: Message, cred=Depends(get_current_user)):
+    uid = cred.get("uid")
+    return {"message": f"Hello, {message.name}! Your uid is [{uid}]"}
 
 
 def index(request: Request):
@@ -113,17 +161,17 @@ def get_suggested_tags(request: Request, tag_substring):
     tmp_tags = ["Java", "JavaScript", "SolidJS", "Three.JS", "Golang"]
 
     return {
-    	"suggested_tags": [tag for tag in tmp_tags if tag_substring in tag],
+        "suggested_tags": [tag for tag in tmp_tags if tag_substring in tag],
     }
 
 
-def get_profile(request: Request, user_id: int):
+def get_profile(request: Request, user_id: str):
     return {
         "name": user_id,
         "icon_url": "http://localhost:3000/logo192.png",
         "sns_link": "https://twitter.com",
 	    "comment": "これはテストだよ",
-	    "join_date": "2020-05-12T23:50:21.817Z",
+	    "join_date": "2020-05-12",
 	    "department": "SkillHub開発部",
 	    "interests": [{"name": "MySQL"}, {"name": "SQLite"}, {"name": "Three.JS"}],
 	    "expertises": [{"name": "postgreSQL", "years": 3}, {"name": "React", "years": 3}, {"name": "TypeScript", "years": 3}, {"name": "fastAPI", "years": 4}],
