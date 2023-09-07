@@ -12,7 +12,7 @@ interface SessionSuggestionPost {
   date: Date;
 }
 
-interface SearchTagResponse {
+interface SearchTecResponse {
   is_accepted: boolean;
   interests: { user_id: string; name: string; icon_url: string }[];
   expertises: {
@@ -29,8 +29,8 @@ interface SearchTagResponse {
   }[];
 }
 
-export interface GetSuggestedTagsResponse {
-  suggested_tags: string[],
+export interface GetSuggestedTecsResponse {
+  suggested_tecs: {id: number, name: string}[],
 }
 
 function Home() {
@@ -90,11 +90,11 @@ function Home() {
     },
   ];
   const [is_searched, setIsSearched] = useState(false);
-  const [tag, setTag] = useState("");
-  const [suggested_tags, setSuggestedTags] = useState([
-    "SolidJS",
-    "Three.JS",
-    "Golang",
+  const [tec, setTec] = useState("");
+  const [suggested_tecs, setSuggestedTecs] = useState([
+    {id: 1, name: "SolidJS"},
+    {id: 1, name: "Three.JS"},
+    {id: 1, name: "Golang"},
   ]);
 
   const [interests, setInterests] = useState(
@@ -127,17 +127,17 @@ function Home() {
 
   const trending_technologies = ["SolidJS", "Three.JS", "Golang"];
 
-  const search_tag = (tag: string) => {
+  const search_tec = (tec: {id: number, name: string}) => {
     axios
-      .get("http://localhost:8000/search-tag/" + tag)
+      .get("http://localhost:8000/search-tec/" + tec.id)
       .then((res) => {
-        const search_tag_res: SearchTagResponse = res.data;
-        if (search_tag_res.is_accepted) {
+        const search_tec_res: SearchTecResponse = res.data;
+        if (search_tec_res.is_accepted) {
           setIsSearched(true);
-          setTag(tag);
-          setInterests(search_tag_res.interests);
-          setExpertises(search_tag_res.expertises);
-          setExperiences(search_tag_res.experiences);
+          setTec(tec.name);
+          setInterests(search_tec_res.interests);
+          setExpertises(search_tec_res.expertises);
+          setExperiences(search_tec_res.experiences);
         }
       })
       .catch((err) => {
@@ -145,12 +145,12 @@ function Home() {
       });
   };
 
-  const get_suggested_tags = (tag_substring: string) => {
+  const get_suggested_tecs = (tec_substring: string) => {
     axios
-      .get("http://localhost:8000/get-suggested-tags/" + tag_substring)
+      .get("http://localhost:8000/get-suggested-tecs/" + tec_substring)
       .then((res) => {
-        const get_suggested_tags_res: GetSuggestedTagsResponse = res.data;
-        setSuggestedTags(get_suggested_tags_res.suggested_tags);
+        const get_suggested_tecs_res: GetSuggestedTecsResponse = res.data;
+        setSuggestedTecs(get_suggested_tecs_res.suggested_tecs);
       })
       .catch((err) => {
         console.log(err);
@@ -170,28 +170,28 @@ function Home() {
           <Modal.Body>
             <div className="container">
               <div className="d-flex flex-wrap mb-2">
-                <h4 className="m-auto col-3">タグ検索</h4>
+                <h4 className="m-auto col-3">技術検索</h4>
                 <input
                   type="text"
                   className="px-3 py-2 m-0 col-9 border border-gray rounded-pill h3"
-                  value={tag}
+                  value={tec}
                   onChange={(e) => {
-                    setTag(e.target.value);
-                    get_suggested_tags(e.target.value);
+                    setTec(e.target.value);
+                    get_suggested_tecs(e.target.value);
                   }}
                 />
               </div>
               <div className="d-flex mb-2">
                 <div className="col-9 d-flex ml-auto px-2 py-2 lh-auto border border-gray rounded">
-                  {suggested_tags.map((tag) => {
+                  {suggested_tecs.map((tec) => {
                     return (
                       <button
                         className="btn btn-link p-0 mx-2"
                         onClick={() => {
-                          search_tag(tag);
+                          search_tec(tec);
                         }}
                       >
-                        #{tag}
+                        {tec.name}
                       </button>
                     );
                   })}
