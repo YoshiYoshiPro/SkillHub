@@ -160,11 +160,6 @@ def get_trend_tecs(request: Request):
 def get_suggested_tecs(request: Request, tec_substring):
     tmp_tecs = ["Java", "JavaScript", "SolidJS", "Three.JS", "Golang"]
 
-    
-    
-    
-    
-    
     return {
         "tecs": [{"id": 1, "name": tec_name} for tec_name in tmp_tecs if tec_substring in tec_name],
     }

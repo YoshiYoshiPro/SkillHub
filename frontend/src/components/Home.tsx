@@ -29,6 +29,15 @@ interface SearchTecResponse {
   }[];
 }
 
+interface GetTimelineResponse {
+  posts: [
+		technology_id: number,
+		date: string,
+		content: string,
+		likes: number,
+  ]
+}
+
 export interface GetTecsResponse {
   tecs: { id: number; name: string }[];
 }
@@ -155,6 +164,17 @@ function Home() {
   useEffect(() => {
     axios
       .get("http://localhost:8000/get-trend-tecs/")
+      .then((res) => {
+        const get_trend_tecs_res: GetTecsResponse = res.data;
+        setTrendTecs(get_trend_tecs_res.tecs);
+        setSuggestedTecs(get_trend_tecs_res.tecs);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+
+    axios
+      .get("http://localhost:8000/get-timeline/")
       .then((res) => {
         const get_trend_tecs_res: GetTecsResponse = res.data;
         setTrendTecs(get_trend_tecs_res.tecs);
