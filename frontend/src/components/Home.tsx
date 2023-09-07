@@ -16,7 +16,7 @@ interface SearchTagResponse {
 	experiences: {user_id: string, name: string, icon_url: string, years: number}[],
 }
 
-interface GetSuggestedTagsResponse {
+export interface GetSuggestedTagsResponse {
   suggested_tags: string[],
 }
 
