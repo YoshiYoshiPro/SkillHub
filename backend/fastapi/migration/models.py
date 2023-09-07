@@ -4,6 +4,7 @@ from core.config import get_env
 from sqlalchemy import (Column, DateTime, ForeignKey, Integer, LargeBinary,
                         String, Text, create_engine)
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import relationship  # 必要な場合はインポート
 
 # Engine の作成
 Engine = create_engine(
@@ -130,6 +131,7 @@ class UserExperiences(BaseModel):
     user_id = Column("user_id", Integer,  ForeignKey("users.id"))
     technology_id = Column("technology_id", ForeignKey("technologies.id"))
     experience_years = Column("experience_years", Integer)
+    user = relationship("UserDetail", backref="experiences")  # 追加
 
 
 
@@ -147,6 +149,7 @@ class UserExpertises(BaseModel):
     user_id = Column("user_id",  Integer, ForeignKey("users.id"))
     technology_id = Column("technology_id", ForeignKey("technologies.id"))
     expertise_years = Column("expertise_years", Integer)
+    user = relationship("UserDetail", backref="expertises")  # 追加
 
 
 
@@ -164,6 +167,7 @@ class UserInterests(BaseModel):
     user_id = Column("user_id",  Integer, ForeignKey("users.id"))
     technology_id = Column("technology_id", ForeignKey("technologies.id"))
     interest_years = Column("interest_years", Integer)
+    user = relationship("UserDetail", backref="interests")
 
 
 

@@ -49,3 +49,6 @@ app.add_api_route('/update-timeline', timeline , methods=['GET'])
 
 # トレンド技術取得リクエスト
 app.add_api_route('/get-trend-tec', get_trend , methods=['GET'])
+
+# # 技術人検索リクエスト
+# app.add_api_route('/tec-search/{tec_id}', get_tech_users , methods=['GET'])

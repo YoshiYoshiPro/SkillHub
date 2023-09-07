@@ -5,7 +5,7 @@ from firebase_admin import auth, credentials
 from pydantic import BaseModel
 from sqlalchemy import desc, func
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from starlette.middleware.cors import CORSMiddleware
 from starlette.requests import Request
 
@@ -333,3 +333,21 @@ def get_trend(db: Session = Depends(get_db)):
     top_technologies = [result.technology_id for result in trend_result]
 
     return top_technologies
+
+# def get_tech_users(tec_id: int, db: Session = Depends(get_db)):
+#     # 1. 指定された tec_id で各テーブルから情報を取得
+#     interests = db.query(models.UserInterests).options(joinedload(models.UserInterests.user)).filter_by(technology_id=tec_id).all()
+#     expertises = db.query(models.UserExpertises).options(joinedload(models.UserExpertises.user)).filter_by(technology_id=tec_id).all()
+#     experiences = db.query(models.UserExperiences).options(joinedload(models.UserExperiences.user)).filter_by(technology_id=tec_id).all()
+
+#     # 2. user_detail から情報を取得
+#     interest_data = [{"user_id": item.user_id, "name": item.user.name, "icon_image": item.user.icon_image, "interest_years": item.interest_years} for item in interests]
+#     expertise_data = [{"user_id": item.user_id, "name": item.user.name, "icon_image": item.user.icon_image, "expertise_years": item.expertise_years} for item in expertises]
+#     experience_data = [{"user_id": item.user_id, "name": item.user.name, "icon_image": item.user.icon_image, "experience_years": item.experience_years} for item in experiences]
+
+#     # 3. 結果を整形して返す
+#     return {
+#         "interests": interest_data,
+#         "expertises": expertise_data,
+#         "experiences": experience_data
+#     }
