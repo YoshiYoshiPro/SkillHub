@@ -164,6 +164,21 @@ def get_suggested_tags(request: Request, tag_substring):
         "suggested_tags": [tag for tag in tmp_tags if tag_substring in tag],
     }
 
+
+def get_profile(request: Request, user_id: str):
+    return {
+        "name": user_id,
+        "icon_url": "http://localhost:3000/logo192.png",
+        "sns_link": "https://twitter.com",
+	    "comment": "これはテストだよ",
+	    "join_date": "2020-05-12",
+	    "department": "SkillHub開発部",
+	    "interests": [{"name": "MySQL"}, {"name": "SQLite"}, {"name": "Three.JS"}],
+	    "expertises": [{"name": "postgreSQL", "years": 3}, {"name": "React", "years": 3}, {"name": "TypeScript", "years": 3}, {"name": "fastAPI", "years": 4}],
+	    "experiences": [{"name": "postgreSQL", "years": 3}, {"name": "React", "years": 3}],
+    }
+
+
 def get_user_by_id(request: Request, user_id: int):
     # データベースセッションを取得
     db = request.state.db

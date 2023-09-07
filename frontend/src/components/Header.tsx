@@ -17,7 +17,7 @@ function Header() {
           <h1 className="my-0">SkillHub</h1>
         </Link>
         <div className="ml-auto my-auto">
-          <Link to="/profile">
+          <Link to={"/profile/" + user?.uid}>
             <img
               className="border border-dark rounded-circle"
               src={user?.photoURL || "http://localhost:3000/logo192.png"}

@@ -29,8 +29,8 @@ interface SearchTagResponse {
   }[];
 }
 
-interface GetSuggestedTagsResponse {
-  suggested_tags: string[];
+export interface GetSuggestedTagsResponse {
+  suggested_tags: string[],
 }
 
 function Home() {
