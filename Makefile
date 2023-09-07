@@ -5,16 +5,21 @@ run: compose/up migrate/up
 compose/up:
 	$(DOCKER_COMPOSE) up -d
 
+compose/up-no-cache:
+	$(DOCKER_COMPOSE) up -d --no-cache
+
 compose/down:
 	$(DOCKER_COMPOSE) down --volumes --remove-orphans --rmi local
 
 compose/logs:
 	$(DOCKER_COMPOSE) logs -f
 
-POSTGRES_USER := root
-DATABASE      := treasure_app
+DATABASE_NAME := postgres-db
+DATABASE      := postgres
 psql:
-	$(DOCKER_COMPOSE) exec db psql -U $(POSTGRES_USER) -d $(DATABASE)
+	$(DOCKER_COMPOSE) exec -it $(DATABASE_NAME) psql -U $(DATABASE)
+
+
 
 GOOSE_DRIVER   := postgres
 GOOSE_DBSTRING ?= host=db user=root dbname=treasure_app password=p@ssword sslmode=disable
