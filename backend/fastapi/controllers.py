@@ -80,13 +80,13 @@ def get_data(request: Request):
     return {"key": "value", "message": "Hello from FastAPI!"}
 
 
-def get_tag_result(request: Request, tag):
+def get_tec_result(request: Request, tec_id: int):
     return {
         "is_accepted": True,
         "interests": [
             {
-                "user_id": tag,
-                "name": tag,
+                "user_id": tec_id,
+                "name": tec_id,
                 "icon_url": "http://localhost:3000/logo192.png",
             },
             {
@@ -149,14 +149,20 @@ def get_tag_result(request: Request, tag):
     }
 
 
-def get_suggested_tags(request: Request, tag_substring):
-    tmp_tags = ["Java", "JavaScript", "SolidJS", "Three.JS", "Golang"]
+def get_suggested_tecs(request: Request, tec_substring):
+    tmp_tecs = ["Java", "JavaScript", "SolidJS", "Three.JS", "Golang"]
 
     return {
-        "suggested_tags": [tag for tag in tmp_tags if tag_substring in tag],
+        "suggested_tecs": [{"id": 1, "name": tec_name} for tec_name in tmp_tecs if tec_substring in tec_name],
     }
 
+
 def get_user_by_id(user_id: int, db: Session = Depends(get_db)):
+
+
+
+
+def get_user_by_id(request: Request, user_id: int):
     # データベースセッションを取得
     # ユーザーをデータベースから取得
     user = db.query(models.Users).filter(models.Users.id == user_id).first()

@@ -7,6 +7,7 @@ import Profile from "./components/Profile";
 import Login from "./components/Login";
 import { AuthProvider } from "./context/AuthContext";
 
+
 function App() {
   return (
     <AuthProvider>
@@ -14,7 +15,7 @@ function App() {
         <Header />
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/profile" element={<Profile />} />
+          <Route path="/profile/:user_id" element={<Profile />} />
           <Route path="/login" element={<Login />} />
         </Routes>
       </div>
