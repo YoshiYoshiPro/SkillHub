@@ -100,6 +100,7 @@ function Home() {
       });
   };
 
+  // ここでグラフの表示を作成
   const graphData = useCallback(() => {
     const experienceArray = new Map();
 
