@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import Modal from "react-bootstrap/Modal";
 import { ComposedChart, CartesianGrid, XAxis, YAxis, Bar } from "recharts";
@@ -29,8 +29,8 @@ interface SearchTecResponse {
   }[];
 }
 
-export interface GetSuggestedTecsResponse {
-  suggested_tecs: {id: number, name: string}[],
+export interface GetTecsResponse {
+  tecs: {id: number, name: string}[],
 }
 
 function Home() {
@@ -91,11 +91,8 @@ function Home() {
   ];
   const [is_searched, setIsSearched] = useState(false);
   const [tec, setTec] = useState("");
-  const [suggested_tecs, setSuggestedTecs] = useState([
-    {id: 1, name: "SolidJS"},
-    {id: 1, name: "Three.JS"},
-    {id: 1, name: "Golang"},
-  ]);
+  const [trend_tecs, setTrendTecs] = useState([] as {id: number, name: string}[]);
+  const [suggested_tecs, setSuggestedTecs] = useState([] as {id: number, name: string}[]);
 
   const [interests, setInterests] = useState(
     [] as { user_id: string; name: string; icon_url: string }[]
@@ -125,8 +122,6 @@ function Home() {
     },
   ];
 
-  const trending_technologies = ["SolidJS", "Three.JS", "Golang"];
-
   const search_tec = (tec: {id: number, name: string}) => {
     axios
       .get("http://localhost:8000/search-tec/" + tec.id)
@@ -149,13 +144,29 @@ function Home() {
     axios
       .get("http://localhost:8000/get-suggested-tecs/" + tec_substring)
       .then((res) => {
-        const get_suggested_tecs_res: GetSuggestedTecsResponse = res.data;
-        setSuggestedTecs(get_suggested_tecs_res.suggested_tecs);
+        const get_suggested_tecs_res: GetTecsResponse = res.data;
+        setSuggestedTecs(get_suggested_tecs_res.tecs);
       })
       .catch((err) => {
         console.log(err);
       });
   };
+
+
+  useEffect(() => {
+    axios
+      .get("http://localhost:8000/get-trend-tecs/")
+      .then((res) => {
+        const get_trend_tecs_res: GetTecsResponse = res.data;
+        setTrendTecs(get_trend_tecs_res.tecs);
+        setSuggestedTecs(get_trend_tecs_res.tecs);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, []);
+
+
   if (!user) {
     navigate("/login");
     return null;
@@ -177,7 +188,8 @@ function Home() {
                   value={tec}
                   onChange={(e) => {
                     setTec(e.target.value);
-                    get_suggested_tecs(e.target.value);
+                    if(e.target.value === "") setSuggestedTecs(trend_tecs);
+                    else get_suggested_tecs(e.target.value);
                   }}
                 />
               </div>
@@ -343,9 +355,10 @@ function Home() {
                   検索
                 </button>
               </div>
+              <h4 className="mt-4 text-secondary">トレンド技術</h4>
               <div className="m-2">
-                {trending_technologies.map((techonology) => {
-                  return <h5 className="fw-bold">#{techonology}</h5>;
+                {trend_tecs.map((tec) => {
+                  return <h5 className="fw-bold">#{tec.name}</h5>;
                 })}
               </div>
             </div>
