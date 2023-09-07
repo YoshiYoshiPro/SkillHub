@@ -31,7 +31,8 @@ const Login: React.FC = () => {
   };
 
   const sendRequestToBackend = async (token: string) => {
-    const response = await fetch(FASTAPI_ENDPOINT, {
+    const apiUrl = `${FASTAPI_ENDPOINT}/users/`;
+    const response = await fetch(apiUrl, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,
