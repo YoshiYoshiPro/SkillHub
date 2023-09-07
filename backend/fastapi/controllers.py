@@ -1,18 +1,17 @@
 from typing import List, Tuple
 
 import firebase_admin
-from firebase_admin import auth, credentials
-from pydantic import BaseModel
-from sqlalchemy.orm import Session
-from starlette.middleware.cors import CORSMiddleware
-from starlette.requests import Request
-
 from core.database import get_db  # ここでget_db関数をインポート
 from crud import crud
 from fastapi import APIRouter, Body, Depends, FastAPI, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from firebase_admin import auth, credentials
 from migration import models
+from pydantic import BaseModel
 from schemas import schemas
+from sqlalchemy.orm import Session
+from starlette.middleware.cors import CORSMiddleware
+from starlette.requests import Request
 
 # from migration import database, models
 
@@ -60,14 +59,14 @@ def get_current_user(cred: HTTPAuthorizationCredentials = Depends(HTTPBearer()))
 
 # getを定義
 @app.get("/hello")
-def read_root(cred=Depends(get_current_user)):
+def read_root(cred):
     uid = cred.get("uid")
     return {"message": f"Hello, {uid}!"}
 
 
 # postを定義
 @app.post("/hello")
-def create_message(message: Message, cred=Depends(get_current_user)):
+def create_message(message: Message, cred):
     uid = cred.get("uid")
     return {"message": f"Hello, {message.name}! Your uid is [{uid}]"}
 
@@ -153,13 +152,12 @@ def get_suggested_tecs(request: Request, tec_substring):
     tmp_tecs = ["Java", "JavaScript", "SolidJS", "Three.JS", "Golang"]
 
     return {
-        "suggested_tecs": [{"id": 1, "name": tec_name} for tec_name in tmp_tecs if tec_substring in tec_name],
+        "suggested_tecs": [
+            {"id": 1, "name": tec_name}
+            for tec_name in tmp_tecs
+            if tec_substring in tec_name
+        ],
     }
-
-
-def get_user_by_id(user_id: int, db: Session = Depends(get_db)):
-
-
 
 
 def get_user_by_id(request: Request, user_id: int):
@@ -172,13 +170,19 @@ def get_user_by_id(request: Request, user_id: int):
     return user
 
 
-def create_user(user: schemas.UsersCreate, db: Session = Depends(get_db)):
-    return crud.create_user(db, user)
+def create_user(db: Session = Depends(get_db), cred: dict = Depends(get_current_user)):
+    user_id = cred.get("uid")
+    new_user = models.Users(id=user_id)
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+    return new_user
 
 
 def get_all_users(db: Session = Depends(get_db)):
     users = crud.get_all_users(db)  # データベース操作関数を呼び出してデータを取得
     return users
+
 
 def get_user_profile(user_id: int, db: Session = Depends(get_db)):
     user = crud.get_user_profile(db, user_id)
@@ -198,6 +202,7 @@ def get_user_profile(user_id: int, db: Session = Depends(get_db)):
     }
     return profile_data
 
+
 def update_user_profile(
     user_id: int,
     edited_sns_link: str = Body(..., description="SNSリンク"),
@@ -207,7 +212,7 @@ def update_user_profile(
     edited_interests: List[int] = Body(..., description="興味のIDリスト"),
     edited_expertises: List[Tuple[int, int]] = Body(..., description="専門性のIDと年数のリスト"),
     edited_experiences: List[Tuple[int, int]] = Body(..., description="経験のIDと年数のリスト"),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
 ):
     try:
         # ユーザープロファイルの取得
@@ -223,9 +228,15 @@ def update_user_profile(
 
         # 興味、専門性、経験の更新
         # データベースから関連データを削除し、新しいデータを追加
-        db.query(models.UserInterests).filter(models.UserInterests.user_id == user_id).delete()
-        db.query(models.UserExpertises).filter(models.UserExpertises.user_id == user_id).delete()
-        db.query(models.UserExperiences).filter(models.UserExperiences.user_id == user_id).delete()
+        db.query(models.UserInterests).filter(
+            models.UserInterests.user_id == user_id
+        ).delete()
+        db.query(models.UserExpertises).filter(
+            models.UserExpertises.user_id == user_id
+        ).delete()
+        db.query(models.UserExperiences).filter(
+            models.UserExperiences.user_id == user_id
+        ).delete()
 
         for interest_id in edited_interests:
             user_interest = models.UserInterests(

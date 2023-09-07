@@ -21,7 +21,7 @@ class Users(BaseModel):
     created_at = Column(
         "created_at",
         DateTime,
-        default=datetime.now(),
+        default=datetime.now,
         nullable=False,
     )
 

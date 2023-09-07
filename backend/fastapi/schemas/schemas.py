@@ -6,11 +6,11 @@ from pydantic import BaseModel
 
 # For Users
 class UsersBase(BaseModel):
-    created_at: datetime
+    id: str
 
 
 class UsersCreate(UsersBase):
-    created_at : datetime
+    created_at: datetime
 
 
 class UsersRead(UsersBase):
@@ -143,8 +143,10 @@ class LikesBase(BaseModel):
     user_id: int
     study_session_id: int
 
+
 class LikesCreate(LikesBase):
     pass
+
 
 class LikesRead(LikesBase):
     id: int
