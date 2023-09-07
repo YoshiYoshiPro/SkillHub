@@ -1,7 +1,7 @@
 import sys
 
 # 相対パスでcoreディレクトリが参照できないので、読み取れるように
-sys.path = ['', '..'] + sys.path[1:]
+sys.path = ["", ".."] + sys.path[1:]
 
 import os
 from logging.config import fileConfig
@@ -9,7 +9,6 @@ from logging.config import fileConfig
 from alembic import context
 from core.config import PROJECT_ROOT
 from dotenv import load_dotenv
-
 from migration.models import BaseModel, Engine
 
 # this is the Alembic Config object, which provides
@@ -23,15 +22,16 @@ fileConfig(config.config_file_name)
 # add your model's MetaData object here
 # for 'autogenerate' support
 # from myapp import mymodel
-# target_metadata = mymodel.Base.metadat
+# target_metadata = mymodel.Base.metadata
 target_metadata = BaseModel.metadata
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
 # my_important_option = config.get_main_option("my_important_option")
 # ... etc.
-load_dotenv(dotenv_path=os.path.join(PROJECT_ROOT, '.env'))
-config.set_main_option('sqlalchemy.url', os.getenv('DATABASE_URL'))
+load_dotenv(dotenv_path=os.path.join(PROJECT_ROOT, ".env"))
+config.set_main_option("sqlalchemy.url", os.getenv("DATABASE_URL"))
+
 
 def run_migrations_offline():
     """Run migrations in 'offline' mode.
@@ -74,8 +74,7 @@ def run_migrations_online():
 
     with connectable.connect() as connection:
         context.configure(
-            url = url,
-            connection=connection, target_metadata=target_metadata
+            url=url, connection=connection, target_metadata=target_metadata
         )
 
         with context.begin_transaction():

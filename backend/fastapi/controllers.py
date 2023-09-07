@@ -63,14 +63,14 @@ def get_current_user(cred: HTTPAuthorizationCredentials = Depends(HTTPBearer()))
 
 # getを定義
 @app.get("/hello")
-def read_root(cred=Depends(get_current_user)):
+def read_root(cred):
     uid = cred.get("uid")
     return {"message": f"Hello, {uid}!"}
 
 
 # postを定義
 @app.post("/hello")
-def create_message(message: Message, cred=Depends(get_current_user)):
+def create_message(message: Message, cred):
     uid = cred.get("uid")
     return {"message": f"Hello, {message.name}! Your uid is [{uid}]"}
 
@@ -164,19 +164,16 @@ def get_suggested_tecs(request: Request, tec_substring):
 
 
 
-
-
-
     return {
-        "tecs": [{"id": 1, "name": tec_name} for tec_name in tmp_tecs if tec_substring in tec_name],
+        "tecs": [
+            {"id": 1, "name": tec_name}
+            for tec_name in tmp_tecs
+            if tec_substring in tec_name
+        ],
     }
 
 
-
 # def get_user_by_id(user_id: int, db: Session = Depends(get_db)):
-
-
-
 
 
 def get_user_by_id(request: Request, user_id: int):
@@ -189,13 +186,19 @@ def get_user_by_id(request: Request, user_id: int):
     return user
 
 
-def create_user(user: schemas.UsersCreate, db: Session = Depends(get_db)):
-    return crud.create_user(db, user)
+def create_user(db: Session = Depends(get_db), cred: dict = Depends(get_current_user)):
+    user_id = cred.get("uid")
+    new_user = models.Users(id=user_id)
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+    return new_user
 
 
 def get_all_users(db: Session = Depends(get_db)):
     users = crud.get_all_users(db)  # データベース操作関数を呼び出してデータを取得
     return users
+
 
 def get_user_profile(user_id: int, db: Session = Depends(get_db)):
     user = crud.get_user_profile(db, user_id)
@@ -215,6 +218,7 @@ def get_user_profile(user_id: int, db: Session = Depends(get_db)):
     }
     return profile_data
 
+
 def update_user_profile(
     user_id: int,
     edited_sns_link: str = Body(..., description="SNSリンク"),
@@ -224,60 +228,67 @@ def update_user_profile(
     edited_interests: List[int] = Body(..., description="興味のIDリスト"),
     edited_expertises: List[Tuple[int, int]] = Body(..., description="専門性のIDと年数のリスト"),
     edited_experiences: List[Tuple[int, int]] = Body(..., description="経験のIDと年数のリスト"),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
 ):
     # try:
-        # ユーザープロファイルの取得
-        user_profile = crud.get_user_profile(db, user_id)
+    # ユーザープロファイルの取得
+    user_profile = crud.get_user_profile(db, user_id)
 
-        # プロファイル情報の更新
-        user_profile.sns_link = edited_sns_link
-        user_profile.comment = edited_comment
-        user_profile.join_date = edited_join_date
-        user_profile.department = edited_department
+    # プロファイル情報の更新
+    user_profile.sns_link = edited_sns_link
+    user_profile.comment = edited_comment
+    user_profile.join_date = edited_join_date
+    user_profile.department = edited_department
 
-        # 興味、専門性、経験の更新
-        # データベースから関連データを削除し、新しいデータを追加
-        db.query(models.UserInterests).filter(models.UserInterests.user_id == user_id).delete()
-        db.query(models.UserExpertises).filter(models.UserExpertises.user_id == user_id).delete()
-        db.query(models.UserExperiences).filter(models.UserExperiences.user_id == user_id).delete()
+    # 興味、専門性、経験の更新
+    # データベースから関連データを削除し、新しいデータを追加
+    db.query(models.UserInterests).filter(
+        models.UserInterests.user_id == user_id
+    ).delete()
+    db.query(models.UserExpertises).filter(
+        models.UserExpertises.user_id == user_id
+    ).delete()
+    db.query(models.UserExperiences).filter(
+        models.UserExperiences.user_id == user_id
+    ).delete()
 
-        for interest_id in edited_interests:
-            user_interest = models.UserInterests(
-                user_id=user_id,
-                technology_id=interest_id,
-                interest_years=1,  # 適切な値を設定してください
-            )
-            db.add(user_interest)
+    for interest_id in edited_interests:
+        user_interest = models.UserInterests(
+            user_id=user_id,
+            technology_id=interest_id,
+            interest_years=1,  # 適切な値を設定してください
+        )
+        db.add(user_interest)
 
-        for expertise in edited_expertises:
-            technology_id, expertise_years = expertise
-            user_expertise = models.UserExpertises(
-                user_id=user_id,
-                technology_id=technology_id,
-                expertise_years=expertise_years,
-            )
-            db.add(user_expertise)
+    for expertise in edited_expertises:
+        technology_id, expertise_years = expertise
+        user_expertise = models.UserExpertises(
+            user_id=user_id,
+            technology_id=technology_id,
+            expertise_years=expertise_years,
+        )
+        db.add(user_expertise)
 
-        for experience in edited_experiences:
-            technology_id, experience_years = experience
-            user_experience = models.UserExperiences(
-                user_id=user_id,
-                technology_id=technology_id,
-                experience_years=experience_years,
-            )
-            db.add(user_experience)
+    for experience in edited_experiences:
+        technology_id, experience_years = experience
+        user_experience = models.UserExperiences(
+            user_id=user_id,
+            technology_id=technology_id,
+            experience_years=experience_years,
+        )
+        db.add(user_experience)
 
-        try:
-            # 既存のコード
-            db.commit()
-            return {"is_accepted": True}
-        except IntegrityError as e:
-            db.rollback()  # ロールバック
-            raise HTTPException(status_code=400, detail="一意制約違反エラー: {}".format(str(e)))
-        except Exception as e:
-            db.rollback()
-            raise HTTPException(status_code=500, detail="データベースエラー: {}".format(str(e)))
+    try:
+        # 既存のコード
+        db.commit()
+        return {"is_accepted": True}
+    except IntegrityError as e:
+        db.rollback()  # ロールバック
+        raise HTTPException(status_code=400, detail="一意制約違反エラー: {}".format(str(e)))
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail="データベースエラー: {}".format(str(e)))
+
 
 
 def update_like(
@@ -351,3 +362,8 @@ def get_trend(db: Session = Depends(get_db)):
 #         "expertises": expertise_data,
 #         "experiences": experience_data
 #     }
+
+# except Exception as e:
+#     # エラーハンドリング
+#     db.rollback()  # ロールバックしてトランザクションを取り消す
+#     raise HTTPException(status_code=500, detail="Internal Server Error")

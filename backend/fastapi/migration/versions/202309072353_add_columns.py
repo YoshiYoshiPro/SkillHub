@@ -1,8 +1,8 @@
 """add columns
 
-Revision ID: 6fd0af28f6ca
-Revises: ff00777dc3bc
-Create Date: 2023-09-06 12:01:09.126918+09:00
+Revision ID: 3a4aec7bde76
+Revises: 1be41efbf7f7
+Create Date: 2023-09-07 23:53:52.199593+09:00
 
 """
 from alembic import op
@@ -10,8 +10,8 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '6fd0af28f6ca'
-down_revision = 'ff00777dc3bc'
+revision = '3a4aec7bde76'
+down_revision = '1be41efbf7f7'
 branch_labels = None
 depends_on = None
 
