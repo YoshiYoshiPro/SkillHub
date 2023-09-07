@@ -163,20 +163,10 @@ function Home() {
 
   useEffect(() => {
     axios
-      .get("http://localhost:8000/get-trend-tecs/")
+      .get("http://localhost:8000/get-trend-tec/")
       .then((res) => {
         const get_trend_tecs_res: GetTecsResponse = res.data;
-        setTrendTecs(get_trend_tecs_res.tecs);
-        setSuggestedTecs(get_trend_tecs_res.tecs);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-
-    axios
-      .get("http://localhost:8000/get-timeline/")
-      .then((res) => {
-        const get_trend_tecs_res: GetTecsResponse = res.data;
+        console.log(get_trend_tecs_res);
         setTrendTecs(get_trend_tecs_res.tecs);
         setSuggestedTecs(get_trend_tecs_res.tecs);
       })

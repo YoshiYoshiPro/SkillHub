@@ -331,8 +331,7 @@ def get_trend(db: Session = Depends(get_db)):
         .limit(3)
         .all()
     )
-
     # クエリ結果からtechnology_idだけのリストを取得
-    top_technologies = [result.technology_id for result in trend_result]
+    top_technologies = {"tecs": [{"id": result.technology_id, "name": crud.get_technology(db, result.technology_id).name} for result in trend_result]}
 
     return top_technologies

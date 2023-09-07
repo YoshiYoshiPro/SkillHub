@@ -64,7 +64,7 @@ function Profile() {
   const edit_end = useCallback(() => {
     setIsEditing(false);
   }, []);
-  const edit_complete = useCallback(() => {
+  const edit_complete = () => {
     setIsEditing(false);
     axios.post('http://localhost:8000/update-profile/1', {
       edited_sns_link: edited_sns_link,
@@ -85,7 +85,7 @@ function Profile() {
         setExperiences(edited_experiences);
       }
     });
-  }, []);
+  };
 
   // 興味のある技術専用タグサジェストを変更する処理
   const interestTecSubstringChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
@@ -136,9 +136,9 @@ function Profile() {
     console.log(e.target.value.trim());
     setEditedJoinDate(e.target.value.trim());
   }, []);
-  const editedDepartmentChange = ((e: React.ChangeEvent<HTMLInputElement>) => {
+  const editedDepartmentChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setEditedDepartment(e.target.value.trim());
-  });
+  }, []);
 
   // 編集中に新たにタグを追加する処理
   const editedInterestsAdd = useCallback((suggested_tec: {id: number, name: string}) => {
