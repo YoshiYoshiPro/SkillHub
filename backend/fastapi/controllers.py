@@ -3,6 +3,7 @@ from typing import List, Tuple
 import firebase_admin
 from firebase_admin import auth, credentials
 from pydantic import BaseModel
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 from starlette.middleware.cors import CORSMiddleware
 from starlette.requests import Request
@@ -157,7 +158,7 @@ def get_suggested_tecs(request: Request, tec_substring):
     }
 
 
-def get_user_by_id(user_id: int, db: Session = Depends(get_db)):
+# def get_user_by_id(user_id: int, db: Session = Depends(get_db)):
 
 
 
@@ -209,11 +210,9 @@ def update_user_profile(
     edited_experiences: List[Tuple[int, int]] = Body(..., description="経験のIDと年数のリスト"),
     db: Session = Depends(get_db)
 ):
-    try:
+    # try:
         # ユーザープロファイルの取得
         user_profile = crud.get_user_profile(db, user_id)
-        # if user_profile is None:
-        #     raise HTTPException(status_code=404, detail="User not found")
 
         # プロファイル情報の更新
         user_profile.sns_link = edited_sns_link
@@ -246,17 +245,25 @@ def update_user_profile(
 
         for experience in edited_experiences:
             technology_id, experience_years = experience
-            user_experience = models.UserExpertises(
+            user_experience = models.UserExperiences(
                 user_id=user_id,
                 technology_id=technology_id,
                 experience_years=experience_years,
             )
             db.add(user_experience)
 
-        db.commit()
-        return {"is_accepted": True}
+        try:
+            # 既存のコード
+            db.commit()
+            return {"is_accepted": True}
+        except IntegrityError as e:
+            db.rollback()  # ロールバック
+            raise HTTPException(status_code=400, detail="一意制約違反エラー: {}".format(str(e)))
+        except Exception as e:
+            db.rollback()
+            raise HTTPException(status_code=500, detail="データベースエラー: {}".format(str(e)))
 
-    except Exception as e:
-        # エラーハンドリング
-        db.rollback()  # ロールバックしてトランザクションを取り消す
-        raise HTTPException(status_code=500, detail="Internal Server Error")
+    # except Exception as e:
+    #     # エラーハンドリング
+    #     db.rollback()  # ロールバックしてトランザクションを取り消す
+    #     raise HTTPException(status_code=500, detail="Internal Server Error")
