@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import axios from "axios";
 import Modal from "react-bootstrap/Modal";
 import { ComposedChart, CartesianGrid, XAxis, YAxis, Bar } from "recharts";
@@ -30,7 +30,7 @@ interface SearchTecResponse {
 }
 
 export interface GetSuggestedTecsResponse {
-  suggested_tecs: {id: number, name: string}[],
+  suggested_tecs: { id: number; name: string }[];
 }
 
 function Home() {
@@ -44,57 +44,12 @@ function Home() {
   };
 
   const [is_searching, setIsSearching] = useState(false);
-
-  const Data = [
-    {
-      name: "1年目 業務経験",
-      業務経験: 10,
-      得意な人: 10,
-      興味のある人: 10,
-    },
-    {
-      name: "2年目 業務経験",
-      業務経験: 10,
-      得意な人: 0,
-      興味のある人: 0,
-    },
-    {
-      name: "3年目 業務経験",
-      業務経験: 10,
-      得意な人: 0,
-      興味のある人: 0,
-    },
-    {
-      name: "2年目 得意な人",
-      業務経験: 0,
-      得意な人: 10,
-      興味のある人: 0,
-    },
-    {
-      name: "3年目 得意な人",
-      業務経験: 0,
-      得意な人: 22,
-      興味のある人: 0,
-    },
-    {
-      name: "4年目 得意な人",
-      業務経験: 0,
-      得意な人: 31,
-      興味のある人: 0,
-    },
-    {
-      name: "興味のある人",
-      業務経験: 0,
-      得意な人: 0,
-      興味のある人: 30,
-    },
-  ];
   const [is_searched, setIsSearched] = useState(false);
   const [tec, setTec] = useState("");
   const [suggested_tecs, setSuggestedTecs] = useState([
-    {id: 1, name: "SolidJS"},
-    {id: 1, name: "Three.JS"},
-    {id: 1, name: "Golang"},
+    { id: 1, name: "SolidJS" },
+    { id: 1, name: "Three.JS" },
+    { id: 1, name: "Golang" },
   ]);
 
   const [interests, setInterests] = useState(
@@ -127,7 +82,7 @@ function Home() {
 
   const trending_technologies = ["SolidJS", "Three.JS", "Golang"];
 
-  const search_tec = (tec: {id: number, name: string}) => {
+  const search_tec = (tec: { id: number; name: string }) => {
     axios
       .get("http://localhost:8000/search-tec/" + tec.id)
       .then((res) => {
@@ -144,6 +99,44 @@ function Home() {
         console.log(err);
       });
   };
+
+  const graphData = useCallback(() => {
+    const experienceArray = new Map();
+
+    const Data = [
+      {
+        name: "",
+        業務経験: experienceArray.get(0),
+        得意な人: 0,
+        興味のある人: 0,
+      },
+      {
+        name: "2年目 得意な人",
+        業務経験: 0,
+        得意な人: expertises.length,
+        興味のある人: 0,
+      },
+      {
+        name: "3年目 得意な人",
+        業務経験: 0,
+        得意な人: expertises.length,
+        興味のある人: 0,
+      },
+      {
+        name: "4年目 得意な人",
+        業務経験: 0,
+        得意な人: interests.length,
+        興味のある人: 0,
+      },
+      {
+        name: "興味のある人",
+        業務経験: 0,
+        得意な人: 0,
+        興味のある人: interests.length,
+      },
+    ];
+    return Data;
+  }, [experiences, expertises, interests]);
 
   const get_suggested_tecs = (tec_substring: string) => {
     axios
@@ -205,7 +198,7 @@ function Home() {
                       width={793}
                       height={500}
                       layout="vertical"
-                      data={Data}
+                      data={graphData()}
                       margin={{ top: 20, right: 60, bottom: 0, left: 150 }}
                     >
                       <XAxis type="number" />
