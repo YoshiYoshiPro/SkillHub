@@ -16,7 +16,12 @@ function Header() {
         <Link to="/" className="text-decoration-none my-auto">
           <h1 className="my-0">SkillHub</h1>
         </Link>
+        {/* <div className="ml-auto">
+          <button className="my-0">a</button>
+        </div> */}
         <div className="ml-auto my-auto">
+          <button className="mr-5 ">ログアウト</button>
+
           <Link to={"/profile/" + user?.uid}>
             <img
               className="border border-dark rounded-circle"
