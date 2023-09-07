@@ -76,7 +76,7 @@ make psql
 ~~postgreSQL コンテナに入る方法~~
 
 ```
-docker compose exec postgres-db sh
+docker container exec -it postgres-db bash
 ```
 
 ~~DB モード起動~~
