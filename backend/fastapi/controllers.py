@@ -3,6 +3,7 @@ from typing import List, Tuple
 import firebase_admin
 from firebase_admin import auth, credentials
 from pydantic import BaseModel
+from sqlalchemy import desc, func
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 from starlette.middleware.cors import CORSMiddleware
@@ -314,11 +315,21 @@ def update_not_like(
 
 
 def timeline(db: Session = Depends(get_db)):
-    # Likes テーブルのデータをクエリ
-    likes = db.query(models.Likes).all()
+    # StudySessionsテーブルの全てのレコードを取得
+    sessions = db.query(models.StudySessions).all()
+    return sessions
 
-    # レコードを JSON 形式に変換
-    likes_json = [{"user_id": like.user_id, "study_session_id": like.study_session_id} for like in likes]
+def get_trend(db: Session = Depends(get_db)):
+    # technology_idごとにカウントを取得し、降順でソート
+    trend_result = (
+        db.query(models.UserInterests.technology_id, func.count(models.UserInterests.technology_id).label('count'))
+        .group_by(models.UserInterests.technology_id)
+        .order_by(desc('count'))
+        .limit(3)
+        .all()
+    )
 
-    # JSON 形式のデータをレスポンスとして返す
-    return JSONResponse(content=likes_json)
+    # クエリ結果からtechnology_idだけのリストを取得
+    top_technologies = [result.technology_id for result in trend_result]
+
+    return top_technologies

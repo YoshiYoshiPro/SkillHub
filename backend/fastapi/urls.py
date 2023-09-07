@@ -32,8 +32,6 @@ app.add_api_route('/users/', create_user, methods=['POST'])
 # ユーザテーブルを全取得するリクエスト
 app.add_api_route('/users/', get_all_users, methods=['GET'])
 
-
-
 # 特定のユーザーのプロフィール情報を取得するリクエスト
 app.add_api_route('/get-profile/{user_id}', get_user_profile, methods=['GET'])
 
@@ -47,4 +45,7 @@ app.add_api_route('/update-like/{session_id}', update_like, methods=['POST'])
 app.add_api_route('/update-not-like/{session_id}', update_not_like, methods=['POST'])
 
 # タイムラインの更新リクエスト
-app.add_api_route('/update-timeline', timeline , method=['GET'])
+app.add_api_route('/update-timeline', timeline , methods=['GET'])
+
+# トレンド技術取得リクエスト
+app.add_api_route('/get-trend-tec', get_trend , methods=['GET'])
