@@ -29,15 +29,15 @@
 `./backend`ディレクトリに移動して、
 コンテナのビルド（開発をはじめて行う時）
 ```
-docker compose build
+make build    （docker compose build）
 ```
 キャッシュなしでビルドしたいときは
 ```
-docker compose build --no-cache
+make build-no-cache   （docker compose build --no-cache）
 ```
 コンテナ起動（開発を開始する毎）
 ```
-docker compose up -d
+make up   （docker compose up -d）
 ```
 
 念の為、コンテナの起動確認
@@ -49,19 +49,24 @@ docker compose ps
 
 もし、エラーが発生している場合でログ確認
 ```
-docker compose logs
+make logs   （docker compose logs）
 ```
 
 コンテナ停止
 ```
-docker compose down
+make down   （docker compose down）
 ```
 
-postgreSQLコンテナに入る方法
+**postgreSQLコンテナに入ってDBモード起動（以下2つの作業を一気に）**
+```
+make psql
+```
+
+~~postgreSQLコンテナに入る方法~~
 ```
 docker container exec -it postgres-db bash
 ```
-DBモード起動
+~~DBモード起動~~
 ```
 psql -U postgres
 ```
