@@ -1,5 +1,6 @@
+from migration import models
+from schemas import schemas
 from sqlalchemy.orm import Session
-
 
 '''from ..migration import models
 from ..schemas import schemas'''
@@ -32,6 +33,12 @@ def create_user_active(db: Session, user_active: schemas.UserActiveCreate):
     db.commit()
     db.refresh(db_user_active)
     return db_user_active
+
+
+def get_all_users(db: Session):
+    users = db.query(models.Users).all()
+    return users
+
 
 
 # For UserLeave
