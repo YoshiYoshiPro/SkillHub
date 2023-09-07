@@ -46,3 +46,6 @@ app.add_api_route('/update-like/{session_id}', update_like, methods=['POST'])
 
 # 勉強会やっぱり参加したくないリクエスト（いいね取り消し機能）
 app.add_api_route('/update-not-like/{session_id}', update_not_like, methods=['POST'])
+
+# タイムラインの更新リクエスト
+app.add_api_route('/update-timeline', timeline , method=['GET'])

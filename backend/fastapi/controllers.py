@@ -11,6 +11,7 @@ from starlette.requests import Request
 from core.database import get_db  # ここでget_db関数をインポート
 from crud import crud
 from fastapi import APIRouter, Body, Depends, FastAPI, HTTPException, status
+from fastapi.responses import JSONResponse
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from migration import models
 from schemas import schemas
@@ -310,3 +311,14 @@ def update_not_like(
     else:
         # レコードが見つからなかった場合、エラーレスポンスなど適切な処理を行う
         return {"message": "Like not found"}
+
+
+def timeline(db: Session = Depends(get_db)):
+    # Likes テーブルのデータをクエリ
+    likes = db.query(models.Likes).all()
+
+    # レコードを JSON 形式に変換
+    likes_json = [{"user_id": like.user_id, "study_session_id": like.study_session_id} for like in likes]
+
+    # JSON 形式のデータをレスポンスとして返す
+    return JSONResponse(content=likes_json)
