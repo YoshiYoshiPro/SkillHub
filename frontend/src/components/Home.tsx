@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import Modal from "react-bootstrap/Modal";
 import { ComposedChart, CartesianGrid, XAxis, YAxis, Bar } from "recharts";
@@ -44,51 +44,6 @@ function Home() {
   };
 
   const [is_searching, setIsSearching] = useState(false);
-
-  const Data = [
-    {
-      name: "1年目 業務経験",
-      業務経験: 10,
-      得意な人: 10,
-      興味のある人: 10,
-    },
-    {
-      name: "2年目 業務経験",
-      業務経験: 10,
-      得意な人: 0,
-      興味のある人: 0,
-    },
-    {
-      name: "3年目 業務経験",
-      業務経験: 10,
-      得意な人: 0,
-      興味のある人: 0,
-    },
-    {
-      name: "2年目 得意な人",
-      業務経験: 0,
-      得意な人: 10,
-      興味のある人: 0,
-    },
-    {
-      name: "3年目 得意な人",
-      業務経験: 0,
-      得意な人: 22,
-      興味のある人: 0,
-    },
-    {
-      name: "4年目 得意な人",
-      業務経験: 0,
-      得意な人: 31,
-      興味のある人: 0,
-    },
-    {
-      name: "興味のある人",
-      業務経験: 0,
-      得意な人: 0,
-      興味のある人: 30,
-    },
-  ];
   const [is_searched, setIsSearched] = useState(false);
   const [tec, setTec] = useState("");
   const [trend_tecs, setTrendTecs] = useState(
@@ -107,6 +62,47 @@ function Home() {
   const [experiences, setExperiences] = useState(
     [] as { user_id: string; name: string; icon_url: string; years: number }[]
   );
+
+  const graph_data = useCallback(() => {
+    const expertise_counter = new Map<number, number>();
+    const experience_counter = new Map<number, number>();
+
+    expertises.forEach(expertise => {
+      const expertise_count = expertise_counter.get(expertise.years);
+      if(expertise_count === undefined) expertise_counter.set(expertise.years, 1);
+      else expertise_counter.set(expertise.years, expertise_count + 1);
+    });
+    experiences.forEach(experience => {
+      const experience_count = experience_counter.get(experience.years);
+      if(experience_count === undefined) experience_counter.set(experience.years, 1);
+      else experience_counter.set(experience.years, experience_count + 1);
+    });
+
+    return [
+      {
+        name: "興味のある人",
+        業務経験: 0,
+        得意な人: 0,
+        興味のある人: interests.length,
+      },
+      ...Array.from(experience_counter).map(([years, count]) => {
+        return {
+          name: "業務経験(" + years + "年目)",
+          業務経験: count,
+          得意な人: 0,
+          興味のある人: 0,
+        }
+      }),
+      ...Array.from(expertise_counter).map(([years, count]) => {
+        return {
+          name: "得意(" + years + "年目)",
+          業務経験: 0,
+          得意な人: count,
+          興味のある人: 0,
+        }
+      })
+    ]
+  }, [interests, expertises, experiences])();
 
   const posts: SessionSuggestionPost[] = [
     {
@@ -219,7 +215,7 @@ function Home() {
                       width={793}
                       height={500}
                       layout="vertical"
-                      data={Data}
+                      data={graph_data}
                       margin={{ top: 20, right: 60, bottom: 0, left: 150 }}
                     >
                       <XAxis type="number" />

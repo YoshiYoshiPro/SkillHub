@@ -19,7 +19,6 @@ app.add_api_route('/get-trend-tecs/', get_trend_tecs)
 app.add_api_route('/get-suggested-tecs/{tec_substring}', get_suggested_tecs)
 
 
-
 # プロフィール情報取得リクエスト
 app.add_api_route('/get-profile/{user_id}', get_user_profile)
 
