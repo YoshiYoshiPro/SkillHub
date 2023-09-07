@@ -44,6 +44,51 @@ function Home() {
   };
 
   const [is_searching, setIsSearching] = useState(false);
+
+  const Data = [
+    {
+      name: "1年目 業務経験",
+      業務経験: 10,
+      得意な人: 10,
+      興味のある人: 10,
+    },
+    {
+      name: "2年目 業務経験",
+      業務経験: 10,
+      得意な人: 0,
+      興味のある人: 0,
+    },
+    {
+      name: "3年目 業務経験",
+      業務経験: 10,
+      得意な人: 0,
+      興味のある人: 0,
+    },
+    {
+      name: "2年目 得意な人",
+      業務経験: 0,
+      得意な人: 10,
+      興味のある人: 0,
+    },
+    {
+      name: "3年目 得意な人",
+      業務経験: 0,
+      得意な人: 22,
+      興味のある人: 0,
+    },
+    {
+      name: "4年目 得意な人",
+      業務経験: 0,
+      得意な人: 31,
+      興味のある人: 0,
+    },
+    {
+      name: "興味のある人",
+      業務経験: 0,
+      得意な人: 0,
+      興味のある人: 30,
+    },
+  ];
   const [is_searched, setIsSearched] = useState(false);
   const [tag, setTag] = useState("");
   const [suggested_tags, setSuggestedTags] = useState([
@@ -61,13 +106,6 @@ function Home() {
   const [experiences, setExperiences] = useState(
     [] as { user_id: string; name: string; icon_url: string; years: number }[]
   );
-
-  const data = [
-    { name: "1年目", year: 30 },
-    { name: "2年目", year: 83 },
-    { name: "3年目", year: 140 },
-    { name: "4年目", year: 60 },
-  ];
 
   const posts: SessionSuggestionPost[] = [
     {
@@ -164,15 +202,34 @@ function Home() {
                 <div>
                   <div className="d-flex">
                     <ComposedChart
-                      width={600}
-                      height={300}
-                      data={data}
-                      margin={{ top: 5, right: 20, bottom: 5, left: 0 }}
+                      width={793}
+                      height={500}
+                      layout="vertical"
+                      data={Data}
+                      margin={{ top: 20, right: 60, bottom: 0, left: 150 }}
                     >
-                      <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
-                      <XAxis dataKey="name" />
-                      <YAxis />
-                      <Bar dataKey="year" barSize={20} fill="red" />
+                      <XAxis type="number" />
+                      <YAxis type="category" dataKey="name" />
+
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <Bar
+                        dataKey="業務経験"
+                        stackId="a"
+                        barSize={20}
+                        fill="#2250A2"
+                      />
+                      <Bar
+                        dataKey="得意な人"
+                        stackId="a"
+                        barSize={20}
+                        fill="#FF8042"
+                      />
+                      <Bar
+                        dataKey="興味のある人"
+                        stackId="a"
+                        barSize={20}
+                        fill="#00C49F"
+                      />
                     </ComposedChart>
                   </div>
 
