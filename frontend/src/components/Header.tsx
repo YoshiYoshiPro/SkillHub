@@ -36,13 +36,16 @@ function Header() {
               </button>
             </>
           ) : null}
-          <Link to={"/profile/" + user?.uid}>
-            <img
-              className="border border-dark rounded-circle"
-              src={user?.photoURL || "http://localhost:3000/logo192.png"}
-              width={50}
-            />
-          </Link>
+          {
+            user &&
+            <Link to={"/profile/" + user?.uid}>
+              <img
+                className="border border-dark rounded-circle"
+                src={user?.photoURL || "http://localhost:3000/logo192.png"}
+                width={50}
+              />
+            </Link>
+          }
         </div>
       </div>
     </header>

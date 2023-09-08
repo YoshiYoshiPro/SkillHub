@@ -391,7 +391,7 @@ import random
 programming_languages = ["Python", "Ruby", "JavaScript", "Java", "C++", "PHP", "Go"]
 def post_tech(db: Session = Depends(get_db)):
     # ランダムなプログラミング言語を選択
-    content = f"{random.choice(programming_languages)}の勉強会"
+    content = f"{random.choice(programming_languages)}の勉強会を開催いたします！"
     created_at = datetime.now()
     date = datetime.now() + timedelta(days=random.randint(1, 30))
     # StudySessionsテーブルにデータを挿入

@@ -222,75 +222,75 @@ function Profile() {
             />
           </div>
           <div className="col-8">
-            <div className="mt-5 mb-5 d-flex">
-              <p className=" mb-1">名前</p>
-              <p className="text-center w-75 ml-auto">{name}</p>
+            <div className="mt-5 mb-4 d-flex">
+              <h2 className="mb-1 w-25">名前</h2>
+              <h2 className="w-75 ml-5">{name}</h2>
             </div>
-            <div className="mb-5 d-flex">
-              <p className=" mb-1">SNSリンク</p>
+            <div className="mb-4 d-flex">
+              <h5 className="mb-1 w-25">SNSリンク</h5>
 
               {is_editing ? (
                 <input
                   type="text"
-                  className="form-control w-75 ml-auto"
+                  className="form-control w-75 ml-5"
                   value={edited_sns_link}
                   onChange={editedSnsLinkChange}
                 />
               ) : (
-                <p className="text-center w-75 ml-auto">{sns_link}</p>
+                <h5 className="w-75 ml-5">{sns_link}</h5>
               )}
             </div>
-            <div className="mb-5 d-flex">
-              <p className=" mb-1">ひとこと</p>
+            <div className="mb-4 d-flex">
+              <h5 className="mb-1 w-25">ひとこと</h5>
 
               {is_editing ? (
                 <input
                   type="text"
-                  className="form-control w-75 ml-auto"
+                  className="form-control w-75 ml-5"
                   value={edited_comment}
                   onChange={editedCommentChange}
                 />
               ) : (
-                <p className="text-center w-75 ml-auto">{comment}</p>
+                <h5 className="w-75 ml-5">{comment}</h5>
               )}
             </div>
-            <div className="mb-5 d-flex">
-              <p className=" mb-1">入社日</p>
+            <div className="mb-4 d-flex">
+              <h5 className="w-25 mb-1">入社日</h5>
 
               {is_editing ? (
                 <input
                   type="date"
-                  className="form-control w-75 ml-auto"
+                  className="form-control w-75 ml-5"
                   value={new Date(edited_join_date).toLocaleDateString('sv-SE')}
                   onChange={editedJoinDateChange}
                 />
               ) : (
-                <p className="text-center w-75 ml-auto">{new Date(join_date).toLocaleDateString('sv-SE')}</p>
+                <h5 className="w-75 ml-5">{new Date(join_date).toLocaleDateString('sv-SE')}</h5>
               )}
             </div>
-            <div className="mb-5 d-flex">
-              <p className=" mb-1">所属先</p>
+            <div className="mb-4 d-flex">
+              <h5 className="w-25 mb-1">所属先</h5>
 
               {is_editing ? (
                 <input
                   type="text"
-                  className="form-control w-75 ml-auto"
+                  className="form-control w-75 ml-5"
                   value={edited_department}
                   onChange={editedDepartmentChange}
                 />
               ) : (
-                <p className="text-center w-75 ml-auto">{department}</p>
+                <h5 className="w-75 ml-5">{department}</h5>
               )}
             </div>
-            <div className="mb-5 d-flex">
-              <p className="w-25 mb-1">興味のある技術</p>
+            <div className="mb-4 d-flex">
+              <h5 className="w-25 mb-1">興味のある技術</h5>
 
               {is_editing ? (
                 <div className="w-75">
                   {
                     edited_interests.map((interest, index) => {
                       return <div className="d-flex">
-                        <h6 className="w-50 form-control">{interest.name}</h6>
+                        <h5 className="w-50 form-control">{interest.name}</h5>
                         <button className="btn btn-secondary ml-3 p-1 h6" onClick={() => {editedInterestsErase(index)}}>削除</button>
                       </div>
                     })
@@ -314,16 +314,16 @@ function Profile() {
                   {
                     interests.map((interest, index) => {
                       return <>
-                        { index > 0 && <p className="">,</p> }
-                        <p className="">{interest.name}</p>
+                        { index > 0 && <h5 className="">,</h5> }
+                        <h5 className="">{interest.name}</h5>
                       </>
                     })
                   }
                 </div>
               )}
             </div>
-            <div className="mb-5 d-flex">
-              <p className="w-25 mb-1">業務経験のある技術</p>
+            <div className="mb-4 d-flex">
+              <h5 className="w-25 mb-1">業務経験のある技術</h5>
 
               {is_editing ? (
                 <div className="w-75">
@@ -355,16 +355,16 @@ function Profile() {
                   {
                     experiences.map((experience, index) => {
                       return <>
-                        { index > 0 && <p className="">,</p> }
-                        <p className="">{experience.name + "(" + experience.years + "年目)"}</p>
+                        { index > 0 && <h5 className="mr-1">,</h5> }
+                        <h5 className="">{experience.name + "(" + experience.years + "年目)"}</h5>
                       </>
                     })
                   }
                 </div>
               )}
             </div>
-            <div className="mb-5 d-flex">
-              <p className="w-25 mb-1">得意な技術</p>
+            <div className="mb-4 d-flex">
+              <h5 className="w-25 mb-1">得意な技術</h5>
 
               {is_editing ? (
                 <div className="w-75">
@@ -396,8 +396,8 @@ function Profile() {
                   {
                     expertises.map((expertise, index) => {
                       return <>
-                        { index > 0 && <p className="">,</p> }
-                        <p className="">{expertise.name + "(" + expertise.years + "年目)"}</p>
+                        { index > 0 && <p className="mr-1">,</p> }
+                        <h5 className="">{expertise.name + "(" + expertise.years + "年目)"}</h5>
                       </>
                     })
                   }
