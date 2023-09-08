@@ -66,7 +66,9 @@ function Profile() {
   }, []);
   const edit_complete = () => {
     setIsEditing(false);
-    axios.post('http://localhost:8000/update-profile/' + user?.uid, {
+    user?.getIdToken().then(token => {
+      console.log(token);
+    axios.post('http://localhost:8000/update-profile/', {
       edited_sns_link: edited_sns_link,
       edited_comment: edited_comment,
       edited_join_date: edited_join_date,
@@ -74,6 +76,11 @@ function Profile() {
       edited_interests: edited_interests.map(interest => interest.id),
       edited_expertises: edited_expertises.map(expertise => [expertise.id, expertise.years]),
       edited_experiences: edited_experiences.map(experience => [experience.id, experience.years]),
+    },
+    { headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + token,
+      },
     }).then((res) => {
       if(res.data.is_accepted) {
         setSnsLink(edited_sns_link);
@@ -84,6 +91,7 @@ function Profile() {
         setExpertises(edited_expertises);
         setExperiences(edited_experiences);
       }
+    });
     });
   };
 

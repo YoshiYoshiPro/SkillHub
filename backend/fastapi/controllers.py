@@ -224,7 +224,7 @@ def get_user_profile(user_id: str, db: Session = Depends(get_db)):
 
 
 def update_user_profile(
-    user_id: str,
+    cred: HTTPAuthorizationCredentials = Depends(HTTPBearer()),
     edited_sns_link: str = Body(..., description="SNSリンク"),
     edited_comment: str = Body(..., description="コメント"),
     edited_join_date: str = Body(..., description="入社日"),
@@ -236,6 +236,7 @@ def update_user_profile(
 ):
     # try:
     # ユーザープロファイルの取得
+    user_id = get_current_user(cred)['user_id']
     user_profile = crud.get_user_profile(db, user_id)
 
     # プロファイル情報の更新
