@@ -2,7 +2,6 @@ import { useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import Modal from "react-bootstrap/Modal";
 import { ComposedChart, CartesianGrid, XAxis, YAxis, Bar } from "recharts";
-import { auth } from "../firebase";
 import { useNavigate } from "react-router-dom";
 import { useAuthContext } from "../context/AuthContext";
 
@@ -30,11 +29,11 @@ interface SearchTecResponse {
 
 interface GetTimelineResponse {
   posts: {
-		date: string,
-		content: string,
-		likes: number,
-    is_linkng: boolean,
-  }[]
+    date: string;
+    content: string;
+    likes: number;
+    is_linkng: boolean;
+  }[];
 }
 
 export interface GetTecsResponse {
@@ -45,18 +44,14 @@ function Home() {
   const navigate = useNavigate();
   const { user } = useAuthContext(); // ユーザー情報の取得
 
-  // ログアウト用の関数
-  const handleLogout = () => {
-    auth.signOut();
-    navigate("/login");
-  };
-
-  const [post, setPosts] = useState([] as {
-		date: string,
-		content: string,
-		likes: number,
-    is_linkng: boolean,
-  }[]);
+  const [post, setPosts] = useState(
+    [] as {
+      date: string;
+      content: string;
+      likes: number;
+      is_linkng: boolean;
+    }[]
+  );
 
   const [is_searching, setIsSearching] = useState(false);
   const [is_searched, setIsSearched] = useState(false);
@@ -72,25 +67,44 @@ function Home() {
     [] as { user_id: string; name: string; icon_image: string }[]
   );
   const [expertises, setExpertises] = useState(
-    [] as { user_id: string; name: string; icon_image: string; expertise_years: number }[]
+    [] as {
+      user_id: string;
+      name: string;
+      icon_image: string;
+      expertise_years: number;
+    }[]
   );
   const [experiences, setExperiences] = useState(
-    [] as { user_id: string; name: string; icon_image: string; experience_years: number }[]
+    [] as {
+      user_id: string;
+      name: string;
+      icon_image: string;
+      experience_years: number;
+    }[]
   );
 
   const graph_data = useCallback(() => {
     const expertise_counter = new Map<number, number>();
     const experience_counter = new Map<number, number>();
 
-    expertises.forEach(expertise => {
+    expertises.forEach((expertise) => {
       const expertise_count = expertise_counter.get(expertise.expertise_years);
-      if(expertise_count === undefined) expertise_counter.set(expertise.expertise_years, 1);
-      else expertise_counter.set(expertise.expertise_years, expertise_count + 1);
+      if (expertise_count === undefined)
+        expertise_counter.set(expertise.expertise_years, 1);
+      else
+        expertise_counter.set(expertise.expertise_years, expertise_count + 1);
     });
-    experiences.forEach(experience => {
-      const experience_count = experience_counter.get(experience.experience_years);
-      if(experience_count === undefined) experience_counter.set(experience.experience_years, 1);
-      else experience_counter.set(experience.experience_years, experience_count + 1);
+    experiences.forEach((experience) => {
+      const experience_count = experience_counter.get(
+        experience.experience_years
+      );
+      if (experience_count === undefined)
+        experience_counter.set(experience.experience_years, 1);
+      else
+        experience_counter.set(
+          experience.experience_years,
+          experience_count + 1
+        );
     });
 
     return [
@@ -106,7 +120,7 @@ function Home() {
           業務経験: count,
           得意な人: 0,
           興味のある人: 0,
-        }
+        };
       }),
       ...Array.from(expertise_counter).map(([years, count]) => {
         return {
@@ -114,9 +128,9 @@ function Home() {
           業務経験: 0,
           得意な人: count,
           興味のある人: 0,
-        }
-      })
-    ]
+        };
+      }),
+    ];
   }, [interests, expertises, experiences])();
 
   const posts: SessionSuggestionPost[] = [
@@ -178,11 +192,12 @@ function Home() {
         console.log(err);
       });
 
-    user?.getIdToken().then(token => {
+    user?.getIdToken().then((token) => {
       axios
-        .get("http://localhost:8000/update-timeline/", { headers: {
-            'Content-Type': 'application/json',
-            Authorization: 'Bearer ' + token,
+        .get("http://localhost:8000/update-timeline/", {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + token,
           },
         })
         .then((res) => {
