@@ -13,28 +13,28 @@ interface SessionSuggestionPost {
 }
 
 interface SearchTecResponse {
-  interests: { user_id: string; name: string; icon_url: string }[];
+  interests: { user_id: string; name: string; icon_image: string }[];
   expertises: {
     user_id: string;
     name: string;
-    icon_url: string;
+    icon_image: string;
     expertise_years: number;
   }[];
   experiences: {
     user_id: string;
     name: string;
-    icon_url: string;
+    icon_image: string;
     experience_years: number;
   }[];
 }
 
 interface GetTimelineResponse {
-  posts: [
-		technology_id: number,
+  posts: {
 		date: string,
 		content: string,
 		likes: number,
-  ]
+    is_linkng: boolean,
+  }[]
 }
 
 export interface GetTecsResponse {
@@ -51,6 +51,13 @@ function Home() {
     navigate("/login");
   };
 
+  const [post, setPosts] = useState([] as {
+		date: string,
+		content: string,
+		likes: number,
+    is_linkng: boolean,
+  }[]);
+
   const [is_searching, setIsSearching] = useState(false);
   const [is_searched, setIsSearched] = useState(false);
   const [tec, setTec] = useState("");
@@ -62,13 +69,13 @@ function Home() {
   );
 
   const [interests, setInterests] = useState(
-    [] as { user_id: string; name: string; icon_url: string }[]
+    [] as { user_id: string; name: string; icon_image: string }[]
   );
   const [expertises, setExpertises] = useState(
-    [] as { user_id: string; name: string; icon_url: string; expertise_years: number }[]
+    [] as { user_id: string; name: string; icon_image: string; expertise_years: number }[]
   );
   const [experiences, setExperiences] = useState(
-    [] as { user_id: string; name: string; icon_url: string; experience_years: number }[]
+    [] as { user_id: string; name: string; icon_image: string; experience_years: number }[]
   );
 
   const graph_data = useCallback(() => {
@@ -170,6 +177,23 @@ function Home() {
       .catch((err) => {
         console.log(err);
       });
+
+    user?.getIdToken().then(token => {
+      axios
+        .get("http://localhost:8000/update-timeline/", { headers: {
+            'Content-Type': 'application/json',
+            Authorization: 'Bearer ' + token,
+          },
+        })
+        .then((res) => {
+          const get_timeline_res: GetTimelineResponse = res.data;
+          console.log(get_timeline_res);
+          setPosts(get_timeline_res.posts);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    });
   }, []);
 
   if (!user) {
@@ -258,7 +282,7 @@ function Home() {
                           <div className="m-2 p-1 border border-gray rounded d-flex">
                             <img
                               className="border border-dark rounded-circle m-1"
-                              src={expertise.icon_url}
+                              src={expertise.icon_image}
                               width={50}
                             />
                             <div className="my-auto">
@@ -281,7 +305,7 @@ function Home() {
                           <div className="m-2 p-1 border border-gray rounded d-flex">
                             <img
                               className="border border-dark rounded-circle m-1"
-                              src={experience.icon_url}
+                              src={experience.icon_image}
                               width={50}
                             />
                             <div className="my-auto">
@@ -304,7 +328,7 @@ function Home() {
                           <div className="m-2 p-1 border border-gray rounded d-flex">
                             <img
                               className="border border-dark rounded-circle m-1"
-                              src={interest.icon_url}
+                              src={interest.icon_image}
                               width={50}
                             />
                             <div className="my-auto">

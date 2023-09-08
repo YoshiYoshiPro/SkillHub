@@ -54,3 +54,6 @@ app.add_api_route('/get-trend-tec', get_trend , methods=['GET'])
 
 # 技術人検索リクエスト
 app.add_api_route('/tec-search/{tec_id}', get_tech_users , methods=['GET'])
+
+
+app.add_api_route('/tec-post', post_tech , methods=['POST'])
