@@ -66,7 +66,9 @@ function Profile() {
   }, []);
   const edit_complete = () => {
     setIsEditing(false);
-    axios.post('http://localhost:8000/update-profile/' + user?.uid, {
+    user?.getIdToken().then(token => {
+      console.log(token);
+    axios.post('http://localhost:8000/update-profile/', {
       edited_sns_link: edited_sns_link,
       edited_comment: edited_comment,
       edited_join_date: edited_join_date,
@@ -74,6 +76,11 @@ function Profile() {
       edited_interests: edited_interests.map(interest => interest.id),
       edited_expertises: edited_expertises.map(expertise => [expertise.id, expertise.years]),
       edited_experiences: edited_experiences.map(experience => [experience.id, experience.years]),
+    },
+    { headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + token,
+      },
     }).then((res) => {
       if(res.data.is_accepted) {
         setSnsLink(edited_sns_link);
@@ -84,6 +91,7 @@ function Profile() {
         setExpertises(edited_expertises);
         setExperiences(edited_experiences);
       }
+    });
     });
   };
 
@@ -188,6 +196,7 @@ function Profile() {
     .then((res) => {
       const get_profile_res: GetProfileResponse = res.data;
       console.log(get_profile_res);
+      setName(get_profile_res.name);
       setSnsLink(get_profile_res.sns_link);
       setIconUrl(get_profile_res.icon_url);
       setComment(get_profile_res.comment);
@@ -208,7 +217,7 @@ function Profile() {
         <div className="d-flex">
           <div className="col-4 mt-5">
             <img
-              src={user?.photoURL || log1}
+              src={icon_url}
               className="rounded-circle border border-dark"
               alt="アイコン"
             />
@@ -216,11 +225,7 @@ function Profile() {
           <div className="col-8">
             <div className="mt-5 mb-5 d-flex">
               <p className=" mb-1">名前</p>
-              <p className="text-center w-75 ml-auto">{user?.displayName}</p>
-            </div>
-            <div className="mb-5 d-flex">
-              <p className=" mb-1">メールアドレス</p>
-              <p className="text-center w-75 ml-auto">{user?.email}</p>
+              <p className="text-center w-75 ml-auto">{name}</p>
             </div>
             <div className="mb-5 d-flex">
               <p className=" mb-1">SNSリンク</p>
@@ -401,30 +406,33 @@ function Profile() {
               )}
             </div>
 
-            <div className="d-flex">
-              { is_editing ?
-                <>
-                  <button
-                    className="ml-auto mr-5 mb-5 mt-4 btn btn-secondary"
-                    onClick={edit_end}
-                  >
-                    編集やめる
-                  </button>
+            {
+              user?.uid === user_id &&
+              <div className="d-flex">
+                { is_editing ?
+                  <>
+                    <button
+                      className="ml-auto mr-5 mb-5 mt-4 btn btn-secondary"
+                      onClick={edit_end}
+                    >
+                      編集やめる
+                    </button>
+                    <button
+                      className="ml-auto mr-5 mb-5 mt-4 btn btn-primary"
+                      onClick={edit_complete}
+                    >
+                      編集完了
+                    </button>
+                  </> :
                   <button
                     className="ml-auto mr-5 mb-5 mt-4 btn btn-primary"
-                    onClick={edit_complete}
+                    onClick={edit_start}
                   >
-                    編集完了
+                    編集
                   </button>
-                </> :
-                <button
-                  className="ml-auto mr-5 mb-5 mt-4 btn btn-primary"
-                  onClick={edit_start}
-                >
-                  編集
-                </button>
-              }
-            </div>
+                }
+              </div>
+            }
           </div>
         </div>
       </div>

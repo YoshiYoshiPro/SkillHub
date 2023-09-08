@@ -38,7 +38,7 @@ app.add_api_route("/users/", get_all_users, methods=["GET"])
 app.add_api_route("/get-profile/{user_id}", get_user_profile, methods=["GET"])
 
 # 特定のユーザーのプロフィール情報を編集するリクエスト
-app.add_api_route('/update-profile/{user_id}', update_user_profile, methods=['POST'])
+app.add_api_route('/update-profile/', update_user_profile, methods=['POST'])
 
 # 勉強会参加したいリクエスト（いいね機能）
 app.add_api_route('/update-like/{session_id}', update_like, methods=['POST'])
