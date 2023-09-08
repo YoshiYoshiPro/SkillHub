@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import axios from "axios";
 import Modal from "react-bootstrap/Modal";
 import { ComposedChart, CartesianGrid, XAxis, YAxis, Bar } from "recharts";
@@ -278,19 +279,21 @@ function Home() {
                     {expertises.map((expertise) => {
                       return (
                         <div className="col-6 p-0">
-                          <div className="m-2 p-1 border border-gray rounded d-flex">
-                            <img
-                              className="border border-dark rounded-circle m-1"
-                              src={expertise.icon_image}
-                              width={50}
-                            />
-                            <div className="my-auto">
-                              <h4 className="m-0">{expertise.name}</h4>
+                          <Link to={'/profile/' + expertise.user_id}>
+                            <div className="m-2 p-1 border border-gray rounded d-flex">
+                              <img
+                                className="border border-dark rounded-circle m-1"
+                                src={expertise.icon_image}
+                                width={50}
+                              />
+                              <div className="text-dark my-auto">
+                                <h4 className="m-0">{expertise.name}</h4>
+                              </div>
+                              <h4 className="text-dark ml-auto mr-2 my-auto">
+                                {expertise.expertise_years}年目
+                              </h4>
                             </div>
-                            <h4 className="ml-auto mr-2 my-auto">
-                              {expertise.expertise_years}年目
-                            </h4>
-                          </div>
+                          </Link>
                         </div>
                       );
                     })}
@@ -301,19 +304,21 @@ function Home() {
                     {experiences.map((experience) => {
                       return (
                         <div className="col-6 p-0">
-                          <div className="m-2 p-1 border border-gray rounded d-flex">
-                            <img
-                              className="border border-dark rounded-circle m-1"
-                              src={experience.icon_image}
-                              width={50}
-                            />
-                            <div className="my-auto">
-                              <h4 className="m-0">{experience.name}</h4>
+                          <Link to={'/profile/' + experience.user_id}>
+                            <div className="m-2 p-1 border border-gray rounded d-flex">
+                              <img
+                                className="border border-dark rounded-circle m-1"
+                                src={experience.icon_image}
+                                width={50}
+                              />
+                              <div className="my-auto">
+                                <h4 className="text-dark m-0">{experience.name}</h4>
+                              </div>
+                              <h4 className="text-dark ml-auto mr-2 my-auto">
+                                {experience.experience_years}年目
+                              </h4>
                             </div>
-                            <h4 className="ml-auto mr-2 my-auto">
-                              {experience.experience_years}年目
-                            </h4>
-                          </div>
+                          </Link>
                         </div>
                       );
                     })}
@@ -324,16 +329,18 @@ function Home() {
                     {interests.map((interest) => {
                       return (
                         <div className="col-6 p-0">
-                          <div className="m-2 p-1 border border-gray rounded d-flex">
-                            <img
-                              className="border border-dark rounded-circle m-1"
-                              src={interest.icon_image}
-                              width={50}
-                            />
-                            <div className="my-auto">
-                              <h4 className="m-0">{interest.name}</h4>
+                          <Link to={'/profile/' + interest.user_id}>
+                            <div className="m-2 p-1 border border-gray rounded d-flex">
+                              <img
+                                className="border border-dark rounded-circle m-1"
+                                src={interest.icon_image}
+                                width={50}
+                              />
+                              <div className="my-auto">
+                                <h4 className="text-dark m-0">{interest.name}</h4>
+                              </div>
                             </div>
-                          </div>
+                          </Link>
                         </div>
                       );
                     })}
@@ -361,6 +368,9 @@ function Home() {
                   <div className="border-top border-dark">
                     <p className="border-bottom border-dark m-0 p-2">
                       {post.content}
+                    </p>
+                    <p className="border-bottom border-dark m-0 p-2">
+                      {"開催日:" + post.date}
                     </p>
                     { post.is_liking ?
                       <button className="btn btn-secondary m-2" onClick={() => {
