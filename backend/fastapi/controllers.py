@@ -15,6 +15,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session, joinedload
 from starlette.middleware.cors import CORSMiddleware
 from starlette.requests import Request
+from datetime import datetime, timedelta
 
 # from migration import database, models
 
@@ -177,10 +178,15 @@ def get_user_by_id(request: Request, user_id: int):
 
 def create_user(db: Session = Depends(get_db), cred: dict = Depends(get_current_user)):
     user_id = cred.get("uid")
+    user_name = cred.get("name")
+    icon_image = cred.get("picture")
     new_user = models.Users(id=user_id)
+    new_user_detail = models.UserDetail(user_id=user_id, name=user_name, join_date=datetime.now().date(), icon_image=icon_image)
     db.add(new_user)
+    db.add(new_user_detail)
     db.commit()
     db.refresh(new_user)
+    db.refresh(new_user_detail)
     return new_user
 
 
@@ -330,10 +336,13 @@ def update_not_like(
         return {"message": "Like not found"}
 
 
-def timeline(db: Session = Depends(get_db)):
+def timeline(cred: HTTPAuthorizationCredentials = Depends(HTTPBearer()), db: Session = Depends(get_db)):
+    user_id=get_current_user(cred)['user_id']
     # StudySessionsテーブルの全てのレコードを取得
-    sessions = db.query(models.StudySessions).all()
-    return sessions
+    for session in db.query(models.StudySessions).all():
+        likes = db.query(models.Likes).filter(models.Likes.study_session_id==session.id).count()
+        is_liking = db.query(exists().where((models.Likes.study_session_id == session.id) & (models.Likes.user_id == user_id))).scalar()
+        return {"technology_id":session.technology_id,"date":session.date,"content":session.content,"likes":likes,"is_liking":is_liking}
 
 def get_trend(db: Session = Depends(get_db)):
     # technology_idごとにカウントを取得し、降順でソート
@@ -367,3 +376,18 @@ def get_tech_users(tec_id: int, db: Session = Depends(get_db)):
         "expertises": expertise_data,
         "experiences": experience_data
     }
+
+import random
+
+# プログラミング言語のリスト
+programming_languages = ["Python", "Ruby", "JavaScript", "Java", "C++", "PHP", "Go"]
+def post_tech(db: Session = Depends(get_db)):
+    # ランダムなプログラミング言語を選択
+    content = f"{random.choice(programming_languages)}の勉強会"
+    created_at = datetime.now()
+    date = datetime.now() + timedelta(days=random.randint(1, 30))
+    # StudySessionsテーブルにデータを挿入
+    new_session = models.StudySessions(technology_id=1,content=content, date=date, created_at=created_at)
+    db.add(new_session)
+    db.commit()
+    return {"message": "Data inserted successfully"}

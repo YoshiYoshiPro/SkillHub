@@ -67,31 +67,30 @@ function Profile() {
   const edit_complete = () => {
     setIsEditing(false);
     user?.getIdToken().then(token => {
-      console.log(token);
-    axios.post('http://localhost:8000/update-profile/', {
-      edited_sns_link: edited_sns_link,
-      edited_comment: edited_comment,
-      edited_join_date: edited_join_date,
-      edited_department: edited_department,
-      edited_interests: edited_interests.map(interest => interest.id),
-      edited_expertises: edited_expertises.map(expertise => [expertise.id, expertise.years]),
-      edited_experiences: edited_experiences.map(experience => [experience.id, experience.years]),
-    },
-    { headers: {
-        'Content-Type': 'application/json',
-        Authorization: 'Bearer ' + token,
+      axios.post('http://localhost:8000/update-profile/', {
+        edited_sns_link: edited_sns_link,
+        edited_comment: edited_comment,
+        edited_join_date: edited_join_date,
+        edited_department: edited_department,
+        edited_interests: edited_interests.map(interest => interest.id),
+        edited_expertises: edited_expertises.map(expertise => [expertise.id, expertise.years]),
+        edited_experiences: edited_experiences.map(experience => [experience.id, experience.years]),
       },
-    }).then((res) => {
-      if(res.data.is_accepted) {
-        setSnsLink(edited_sns_link);
-        setComment(edited_comment);
-        setJoinDate(edited_join_date);
-        setDepartment(edited_department);
-        setInterests(edited_interests);
-        setExpertises(edited_expertises);
-        setExperiences(edited_experiences);
-      }
-    });
+      { headers: {
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer ' + token,
+        },
+      }).then((res) => {
+        if(res.data.is_accepted) {
+          setSnsLink(edited_sns_link);
+          setComment(edited_comment);
+          setJoinDate(edited_join_date);
+          setDepartment(edited_department);
+          setInterests(edited_interests);
+          setExpertises(edited_expertises);
+          setExperiences(edited_experiences);
+        }
+      });
     });
   };
 
