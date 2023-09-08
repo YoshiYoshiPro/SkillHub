@@ -3,6 +3,9 @@ import { useNavigate } from "react-router-dom";
 import { auth, provider } from "../firebase";
 import { signInWithPopup, getAuth, getIdToken } from "firebase/auth";
 import { useAuthContext } from "../context/AuthContext";
+import login from "../img/btn_google_signin_light_focus_web.png";
+
+<style>.login {}</style>;
 
 const FASTAPI_ENDPOINT = "http://localhost:8000";
 
@@ -47,19 +50,23 @@ const Login: React.FC = () => {
 
   return (
     <>
-      <div className="container p-5">
+      <div className="container p-5 w-50">
         <div className="d-flex my-5">
-          <div className="col-12 mt-5 border border-dark p-5 rounded">
-            <h3 className="mb-5">ログイン</h3>
+          <div className="col-12 p-5 rounded">
+            <h1 className="display-2 font-weight-bold my-5 text-center text-primary">
+              SkillHub
+            </h1>
+            <h3 className="mb-5 mt-5 text-center">ログイン</h3>
             <div className="d-flex">
-              <div className="ml-5 ml-auto mr-5 mt-4">
+              <div className="m-auto">
                 {error && <p style={{ color: "red" }}>{error}</p>}
                 <button
                   type="button"
-                  className="btn btn-primary"
+                  className="btn btn-primary mb-5"
                   onClick={handleLogin}
                 >
                   Googleログイン
+                  {/* <img src={login} className="login" alt="アイコン" /> */}
                 </button>
               </div>
             </div>
