@@ -212,6 +212,7 @@ def get_user_profile(user_id: str, db: Session = Depends(get_db)):
     # プロフィール情報を要求されたフォーマットに整形
     profile_data = {
         "name": user.name,
+        "icon_url": user.icon_image,
         "sns_link": user.sns_link,
         "comment": user.comment,
         "join_date": str(user.join_date),
