@@ -216,6 +216,7 @@ def get_user_profile(user_id: int, db: Session = Depends(get_db)):
         # "expertises": [{"name": expertise.name, "years": expertise.expertise_years} for expertise in user.expertises],
         # "experiences": [{"name": experience.name, "years": experience.experience_years} for experience in user.experiences],
     }
+
     return profile_data
 
 
