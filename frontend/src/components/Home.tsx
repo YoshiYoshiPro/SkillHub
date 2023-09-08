@@ -13,19 +13,18 @@ interface SessionSuggestionPost {
 }
 
 interface SearchTecResponse {
-  is_accepted: boolean;
   interests: { user_id: string; name: string; icon_url: string }[];
   expertises: {
     user_id: string;
     name: string;
     icon_url: string;
-    years: number;
+    expertise_years: number;
   }[];
   experiences: {
     user_id: string;
     name: string;
     icon_url: string;
-    years: number;
+    experience_years: number;
   }[];
 }
 
@@ -66,10 +65,10 @@ function Home() {
     [] as { user_id: string; name: string; icon_url: string }[]
   );
   const [expertises, setExpertises] = useState(
-    [] as { user_id: string; name: string; icon_url: string; years: number }[]
+    [] as { user_id: string; name: string; icon_url: string; expertise_years: number }[]
   );
   const [experiences, setExperiences] = useState(
-    [] as { user_id: string; name: string; icon_url: string; years: number }[]
+    [] as { user_id: string; name: string; icon_url: string; experience_years: number }[]
   );
 
   const graph_data = useCallback(() => {
@@ -77,14 +76,14 @@ function Home() {
     const experience_counter = new Map<number, number>();
 
     expertises.forEach(expertise => {
-      const expertise_count = expertise_counter.get(expertise.years);
-      if(expertise_count === undefined) expertise_counter.set(expertise.years, 1);
-      else expertise_counter.set(expertise.years, expertise_count + 1);
+      const expertise_count = expertise_counter.get(expertise.expertise_years);
+      if(expertise_count === undefined) expertise_counter.set(expertise.expertise_years, 1);
+      else expertise_counter.set(expertise.expertise_years, expertise_count + 1);
     });
     experiences.forEach(experience => {
-      const experience_count = experience_counter.get(experience.years);
-      if(experience_count === undefined) experience_counter.set(experience.years, 1);
-      else experience_counter.set(experience.years, experience_count + 1);
+      const experience_count = experience_counter.get(experience.experience_years);
+      if(experience_count === undefined) experience_counter.set(experience.experience_years, 1);
+      else experience_counter.set(experience.experience_years, experience_count + 1);
     });
 
     return [
@@ -133,16 +132,14 @@ function Home() {
 
   const search_tec = (tec: { id: number; name: string }) => {
     axios
-      .get("http://localhost:8000/search-tec/" + tec.id)
+      .get("http://localhost:8000/tec-search/" + tec.id)
       .then((res) => {
         const search_tec_res: SearchTecResponse = res.data;
-        if (search_tec_res.is_accepted) {
-          setIsSearched(true);
-          setTec(tec.name);
-          setInterests(search_tec_res.interests);
-          setExpertises(search_tec_res.expertises);
-          setExperiences(search_tec_res.experiences);
-        }
+        setIsSearched(true);
+        setTec(tec.name);
+        setInterests(search_tec_res.interests);
+        setExpertises(search_tec_res.expertises);
+        setExperiences(search_tec_res.experiences);
       })
       .catch((err) => {
         console.log(err);
@@ -266,10 +263,9 @@ function Home() {
                             />
                             <div className="my-auto">
                               <h4 className="m-0">{expertise.name}</h4>
-                              <p className="m-0">{expertise.user_id}</p>
                             </div>
                             <h4 className="ml-auto mr-2 my-auto">
-                              {expertise.years}年目
+                              {expertise.expertise_years}年目
                             </h4>
                           </div>
                         </div>
@@ -290,10 +286,9 @@ function Home() {
                             />
                             <div className="my-auto">
                               <h4 className="m-0">{experience.name}</h4>
-                              <p className="m-0">{experience.user_id}</p>
                             </div>
                             <h4 className="ml-auto mr-2 my-auto">
-                              {experience.years}年目
+                              {experience.experience_years}年目
                             </h4>
                           </div>
                         </div>
@@ -314,7 +309,6 @@ function Home() {
                             />
                             <div className="my-auto">
                               <h4 className="m-0">{interest.name}</h4>
-                              <p className="m-0">{interest.user_id}</p>
                             </div>
                           </div>
                         </div>
