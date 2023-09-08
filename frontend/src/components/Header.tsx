@@ -18,7 +18,7 @@ function Header() {
         </Link>
         <div className="ml-auto my-auto">
           <button type="button" className="mr-4 btn btn-primary">
-            Googleログアウト
+            ログアウト
           </button>
           <Link to={"/profile/" + user?.uid}>
             <img
