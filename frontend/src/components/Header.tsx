@@ -1,5 +1,7 @@
 import { Link } from "react-router-dom";
 import { useAuthContext } from "../context/AuthContext";
+import { auth } from "../firebase";
+import { useNavigate } from "react-router-dom";
 
 interface SessionSuggestionPost {
   technology: string;
@@ -9,6 +11,12 @@ interface SessionSuggestionPost {
 
 function Header() {
   const { user } = useAuthContext();
+  const navigate = useNavigate();
+  // ログアウト用の関数
+  const handleLogout = () => {
+    auth.signOut();
+    navigate("/login");
+  };
 
   return (
     <header>
@@ -17,9 +25,17 @@ function Header() {
           <h1 className="my-0">SkillHub</h1>
         </Link>
         <div className="ml-auto my-auto">
-          <button type="button" className="mr-4 btn btn-primary">
-            Googleログアウト
-          </button>
+          {user ? (
+            <>
+              <button
+                type="button"
+                className="mr-4 btn btn-primary"
+                onClick={handleLogout}
+              >
+                ログアウト
+              </button>
+            </>
+          ) : null}
           <Link to={"/profile/" + user?.uid}>
             <img
               className="border border-dark rounded-circle"
