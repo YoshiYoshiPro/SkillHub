@@ -328,8 +328,11 @@ def update_not_like(
 
 def timeline(db: Session = Depends(get_db)):
     # StudySessionsテーブルの全てのレコードを取得
-    sessions = db.query(models.StudySessions).all()
-    return sessions
+    for session in db.query(models.StudySessions).all():
+        likes = db.query(models.Likes).filter(models.Likes.study_session_id==session.id).count()
+        session
+
+        return session,likes
 
 def get_trend(db: Session = Depends(get_db)):
     # technology_idごとにカウントを取得し、降順でソート
