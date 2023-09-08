@@ -3,9 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { auth, provider } from "../firebase";
 import { signInWithPopup, getAuth, getIdToken } from "firebase/auth";
 import { useAuthContext } from "../context/AuthContext";
-import login from "../img/btn_google_signin_light_focus_web.png";
-
-<style>.login {}</style>;
 
 const FASTAPI_ENDPOINT = "http://localhost:8000";
 
@@ -66,7 +63,6 @@ const Login: React.FC = () => {
                   onClick={handleLogin}
                 >
                   Googleログイン
-                  {/* <img src={login} className="login" alt="アイコン" /> */}
                 </button>
               </div>
             </div>
