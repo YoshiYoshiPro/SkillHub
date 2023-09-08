@@ -303,10 +303,12 @@ def update_user_profile(
 
 
 def update_like(
-    user_id: int,
-    study_session_id: int,
-    db: Session = Depends(get_db)
+    cred: HTTPAuthorizationCredentials = Depends(HTTPBearer()),
+    study_session_id: int = Body(..., description="ID"),
+    db: Session = Depends(get_db),
 ):
+    user_id = get_current_user(cred)['user_id']
+
     # Likes モデルの新しいインスタンスを作成し、必要な値を設定します
     new_like = models.Likes(user_id=user_id, study_session_id=study_session_id)
 
@@ -319,10 +321,12 @@ def update_like(
 
 
 def update_not_like(
-    user_id: int,
-    study_session_id: int,
+    cred: HTTPAuthorizationCredentials = Depends(HTTPBearer()),
+    study_session_id: int = Body(..., description="ID"),
     db: Session = Depends(get_db)
 ):
+    user_id = get_current_user(cred)['user_id']
+
     # Likes テーブルから削除対象のレコードをクエリ
     like_to_delete = db.query(models.Likes).filter_by(user_id=user_id, study_session_id=study_session_id).first()
 
@@ -338,11 +342,15 @@ def update_not_like(
 
 def timeline(cred: HTTPAuthorizationCredentials = Depends(HTTPBearer()), db: Session = Depends(get_db)):
     user_id=get_current_user(cred)['user_id']
+
+    posts = []
     # StudySessionsテーブルの全てのレコードを取得
     for session in db.query(models.StudySessions).all():
         likes = db.query(models.Likes).filter(models.Likes.study_session_id==session.id).count()
-        is_liking = db.query(exists().where((models.Likes.study_session_id == session.id) & (models.Likes.user_id == user_id))).scalar()
-        return {"technology_id":session.technology_id,"date":session.date,"content":session.content,"likes":likes,"is_liking":is_liking}
+        is_liking = bool(db.query(models.Likes).filter(models.Likes.study_session_id == session.id).filter(models.Likes.user_id == user_id).scalar())
+        posts.append({"session_id":session.id,"date":session.date,"content":session.content,"likes":likes,"is_liking":is_liking})
+
+    return {"posts": posts}
 
 def get_trend(db: Session = Depends(get_db)):
     # technology_idごとにカウントを取得し、降順でソート

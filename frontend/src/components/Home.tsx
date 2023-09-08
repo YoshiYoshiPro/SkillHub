@@ -29,11 +29,13 @@ interface SearchTecResponse {
 
 interface GetTimelineResponse {
   posts: {
-    date: string;
-    content: string;
-    likes: number;
-    is_linkng: boolean;
-  }[];
+    session_id: number,
+		date: string,
+		content: string,
+		likes: number,
+    is_liking: boolean,
+  }[]
+
 }
 
 export interface GetTecsResponse {
@@ -44,14 +46,14 @@ function Home() {
   const navigate = useNavigate();
   const { user } = useAuthContext(); // ユーザー情報の取得
 
-  const [post, setPosts] = useState(
-    [] as {
-      date: string;
-      content: string;
-      likes: number;
-      is_linkng: boolean;
-    }[]
-  );
+
+  const [posts, setPosts] = useState([] as {
+    session_id: number,
+		date: string,
+		content: string,
+		likes: number,
+    is_liking: boolean,
+  }[]);
 
   const [is_searching, setIsSearching] = useState(false);
   const [is_searched, setIsSearched] = useState(false);
@@ -132,24 +134,6 @@ function Home() {
       }),
     ];
   }, [interests, expertises, experiences])();
-
-  const posts: SessionSuggestionPost[] = [
-    {
-      technology: "SolidJS",
-      likes: 20,
-      date: new Date("2020-05-12T23:50:21.817Z"),
-    },
-    {
-      technology: "Three.JS",
-      likes: 10,
-      date: new Date("2020-05-12T23:50:21.817Z"),
-    },
-    {
-      technology: "Golang",
-      likes: 3,
-      date: new Date("2020-05-12T23:50:21.817Z"),
-    },
-  ];
 
   const search_tec = (tec: { id: number; name: string }) => {
     axios
@@ -369,20 +353,58 @@ function Home() {
         </Modal>
 
         <div className="container">
-          <div className="d-flex mt-2">
+          <div className="d-flex mt-4">
             <div className="col-8 border border-dark">
               <h4 className="text-center m-2">タイムライン</h4>
               {posts.map((post) => {
                 return (
                   <div className="border-top border-dark">
                     <p className="border-bottom border-dark m-0 p-2">
-                      {post.technology}に興味を持っている人が10人います！
-                      <br />
-                      勉強会を開催してみませんか？
+                      {post.content}
                     </p>
-                    <button className="btn btn-primary m-2">
-                      参加したい {post.likes}
-                    </button>
+                    { post.is_liking ?
+                      <button className="btn btn-secondary m-2" onClick={() => {
+                        user?.getIdToken().then(token => {
+                          axios.post("http://localhost:8000/update-not-like/", post.session_id,
+                          { headers: {
+                              'Content-Type': 'application/json',
+                              Authorization: 'Bearer ' + token,
+                            },
+                          }).then((res) => {
+                              setPosts(posts.map((target_post) => {
+                                if(target_post.session_id === post.session_id)
+                                  return {...target_post, is_liking: false, likes: target_post.likes - 1}
+                                return target_post;
+                              }));
+                            })
+                            .catch((err) => {
+                              console.log(err);
+                            });
+                        });
+                      }}>
+                        やっぱ参加したくない {post.likes}
+                      </button> :
+                      <button className="btn btn-primary m-2" onClick={() => {
+                        user?.getIdToken().then(token => {
+                          axios.post('http://localhost:8000/update-like/', post.session_id,
+                          { headers: {
+                              'Content-Type': 'application/json',
+                              Authorization: 'Bearer ' + token,
+                            },
+                          }).then((res) => {
+                            setPosts(posts.map((target_post) => {
+                              if(target_post.session_id === post.session_id)
+                                return {...target_post, is_liking: true, likes: target_post.likes + 1}
+                              return target_post;
+                            }));
+                          }).catch((err) => {
+                            console.log(err);
+                          });
+                        });
+                      }}>
+                        参加したい {post.likes}
+                      </button>
+                    }
                   </div>
                 );
               })}

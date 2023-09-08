@@ -41,10 +41,10 @@ app.add_api_route("/get-profile/{user_id}", get_user_profile, methods=["GET"])
 app.add_api_route('/update-profile/', update_user_profile, methods=['POST'])
 
 # 勉強会参加したいリクエスト（いいね機能）
-app.add_api_route('/update-like/{session_id}', update_like, methods=['POST'])
+app.add_api_route('/update-like/', update_like, methods=['POST'])
 
 # 勉強会やっぱり参加したくないリクエスト（いいね取り消し機能）
-app.add_api_route('/update-not-like/{session_id}', update_not_like, methods=['POST'])
+app.add_api_route('/update-not-like/', update_not_like, methods=['POST'])
 
 # タイムラインの更新リクエスト
 app.add_api_route('/update-timeline', timeline , methods=['GET'])
